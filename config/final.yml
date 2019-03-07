@@ -1,0 +1,6 @@
+---
+name: jenkins
+blobstore:
+  provider: local
+  options:
+    blobstore_path: release-blobs

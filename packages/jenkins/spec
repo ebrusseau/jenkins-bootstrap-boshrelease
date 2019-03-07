@@ -1,0 +1,8 @@
+---
+name: jenkins
+
+dependencies:
+- oracle-jdk
+
+files:
+- jenkins/jenkins.war

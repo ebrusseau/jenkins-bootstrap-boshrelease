@@ -1,0 +1,88 @@
+name: jenkins
+instance_groups:
+- name: jenkins-master
+  azs: [z1]
+  instances: 1
+  jobs:
+  - name: jenkins-master
+    release: jenkins
+    properties:
+      jenkins:
+        admin:
+          create: true
+          password: ((jenkins_admin_password))
+        agent:
+          create: true
+          password: ((jenkins_agent_password))
+        config:
+          repo:
+            enabled: true
+            url: https://github.com/ebrusseau/jenkins-bootstrap-config.git
+            branch: testing
+            # ssh_key: ((jenkins_config_repo_ssh.private_key))
+  networks:
+  - name: default
+  stemcell: default
+  vm_type: default
+
+- name: jenkins-slave
+  azs: [z1]
+  instances: 1
+  jobs:
+  - name: jenkins-slave
+    release: jenkins
+    properties:
+      jenkins:
+        slave:
+          master_password: ((jenkins_agent_password))
+          master_username: agent
+  - name: docker
+    release: docker
+    properties:
+      tcp_address: 0.0.0.0
+      tls_cacert: "((docker-tls.ca))"
+      tls_cert: "((docker-tls.certificate))"
+      tls_key: "((docker-tls.private_key))"
+  networks:
+  - name: default
+  stemcell: default
+  vm_type: default
+
+releases:
+- name: jenkins
+  version: latest
+- name: docker
+  version: 32.0.0
+  url: https://github.com/cloudfoundry-incubator/docker-boshrelease/releases/download/v32.0.0/docker-32.0.0.tgz
+  sha1: f192296243e68150ae66656fc9134a2b2a023184
+
+stemcells:
+- alias: default
+  os: ubuntu-xenial
+  version: latest
+
+update:
+  canaries: 1
+  canary_watch_time: 15000-300000
+  max_in_flight: 1
+  update_watch_time: 15000-300000
+
+variables:
+- name: docker-ca
+  type: certificate
+  options:
+    is_ca: true
+    common_name: dockerCA
+- name: docker-tls
+  type: certificate
+  options:
+    ca: docker-ca
+    common_name: docker
+    extended_key_usage:
+    - client_auth
+- name: jenkins_admin_password
+  type: password
+- name: jenkins_agent_password
+  type: password
+- name: jenkins_config_repo_ssh
+  type: ssh

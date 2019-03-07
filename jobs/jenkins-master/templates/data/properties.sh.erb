@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# job template binding variables
+
+# job name & index of this VM within cluster
+# e.g. JOB_NAME=redis, JOB_INDEX=0
+export NAME='<%= name %>'
+export JOB_INDEX=<%= index %>
+# full job name, like redis/0 or webapp/3
+export JOB_FULL="$NAME/$JOB_INDEX"
+
+# configure custom properties for job
+export JAVA_HOME=/var/vcap/packages/oracle-jdk
+export JAVA=${JAVA_HOME}/bin/java
+
+export JAVA_OPTS="-Dhudson.DNSMultiCast.disabled=true -Djava.awt.headless=true -Djenkins.install.runSetupWizard=false"
+export JAVA_TOOL_OPTIONS="-Djava.awt.headless=true"
+
+export JENKINS=/var/vcap/packages/jenkins/jenkins/jenkins.war
+export MEMORY_SETTINGS=""
+
+export JENKINS_HOME=/var/vcap/store/jenkins-master
+export JENKINS_ARGS="--httpPort=<%= p('jenkins.config.http_port') %> --sessionTimeout=1440"
+
+export CASC_JENKINS_CONFIG=${JENKINS_HOME}/jenkins_config.yml

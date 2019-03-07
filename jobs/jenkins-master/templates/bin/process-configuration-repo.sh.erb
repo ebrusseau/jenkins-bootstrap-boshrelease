@@ -1,0 +1,116 @@
+#!/bin/bash
+
+set -e # exit immediately if a simple command exits with a non-zero status
+set -u # report the usage of uninitialized variables
+
+REPO_URL=<%= p('jenkins.config.repo.url') %>
+REPO_BRANCH=<%= p('jenkins.config.repo.branch') %>
+REPO_PATH=/var/vcap/data/jenkins-config-repo
+JOB_CONFIG_PATH=/var/vcap/jobs/jenkins-master/config
+CONFIG_PATH=/var/vcap/data/jenkins-config
+
+GIT_BINARY=/var/vcap/packages/git-client/bin/git
+SPRUCE_BINARY=/var/vcap/packages/spruce/bin/spruce
+USE_SSH=0
+
+if [[ -z "${REPO_URL}" ]]; then
+  echo "ERROR: Config repo URL not specified"
+  exit 1
+fi
+
+if [[ -d ${REPO_PATH} ]]; then
+  rm -rf ${REPO_PATH}
+fi
+
+if [[ -d ${CONFIG_PATH} ]]; then
+  rm -rf ${CONFIG_PATH}
+fi
+mkdir -p ${CONFIG_PATH}
+
+# Copy SSH config
+if [[ -z $(echo ${REPO_URL} | grep "http") ]]; then
+  echo "Configuring SSH for Jenkins config repo..."
+  if [[ ! $(cat /var/vcap/jobs/jenkins-master/config/ssh/id_rsa) == -* ]]; then
+    echo "ERROR: Value of jenkins.config.repo.ssh_key does not appear to be a valid private SSH key"
+    exit 1
+  fi
+
+  USE_SSH=1
+  if [[ -d /root/.ssh ]]; then
+    echo "Backing up pre-existing /root/.ssh directory..."
+    mv /root/.ssh /root/.ssh_backup
+  fi
+
+  mkdir -p /root/.ssh
+  cp /var/vcap/jobs/jenkins-master/config/ssh/* /root/.ssh/
+  chmod 0600 /root/.ssh/*
+fi
+
+echo "Cloning (shallow) configuration repository at ${REPO_URL}..."
+mkdir -p ${REPO_PATH}
+${GIT_BINARY} clone -b ${REPO_BRANCH} --depth 1 ${REPO_URL} ${REPO_PATH}
+
+echo "Processing configuration repository:"
+
+if [[ -e ${REPO_PATH}/jenkins_config.yml ]]; then
+  if [[ -e ${JOB_CONFIG_PATH}/jenkins_config.yml ]]; then
+    echo "  > Merging jenkins_config.yml"
+    ${SPRUCE_BINARY} merge ${JOB_CONFIG_PATH}/jenkins_config.yml ${REPO_PATH}/jenkins_config.yml > ${CONFIG_PATH}/jenkins_config.yml
+  else
+    echo "  > Copying jenkins_config.yml from Repo"
+    cp ${REPO_PATH}/jenkins_config.yml ${CONFIG_PATH}/jenkins_config.yml
+  fi
+elif [[ -e ${JOB_CONFIG_PATH}/jenkins_config.yml ]]; then
+  echo "  > Copying jenkins_config.yml from Job"
+  cp ${JOB_CONFIG_PATH}/jenkins_config.yml ${CONFIG_PATH}/jenkins_config.yml
+fi
+
+if [[ -e ${REPO_PATH}/plugins.txt ]]; then
+  if [[ -e ${JOB_CONFIG_PATH}/plugins.txt ]]; then
+    echo "  > Merging plugins.txt"
+    cat ${REPO_PATH}/plugins.txt \
+      ${JOB_CONFIG_PATH}/plugins.txt \
+      | awk -F: '!($1 in plugins) {plugins[$1] = $2; print}' | sort > ${CONFIG_PATH}/plugins.txt
+  else
+    echo "  > Copying plugins.txt from Repo"
+    cp ${REPO_PATH}/plugins.txt ${CONFIG_PATH}/plugins.txt
+  fi
+elif [[ -e ${JOB_CONFIG_PATH}/plugins.txt ]]; then
+  echo "  > Copying plugins.txt from Job"
+  cp ${JOB_CONFIG_PATH}/plugins.txt ${CONFIG_PATH}/plugins.txt
+fi
+
+if [[ -d ${JOB_CONFIG_PATH}/userContent ]]; then
+  echo "  > Copying User Content from Job"
+  mkdir -p ${CONFIG_PATH}/userContent
+  cp -R ${JOB_CONFIG_PATH}/userContent/* ${CONFIG_PATH}/userContent
+fi
+
+if [[ -d ${REPO_PATH}/userContent ]]; then
+  echo "  > Copying User Content from Repo"
+  mkdir -p ${CONFIG_PATH}/userContent
+  cp -R ${REPO_PATH}/userContent/* ${CONFIG_PATH}/userContent/
+fi
+
+if [[ -d ${JOB_CONFIG_PATH}/init.groovy.d ]]; then
+  echo "  > Copying init.groovy.d from Job"
+  mkdir -p ${CONFIG_PATH}/init.groovy.d
+  cp -R ${JOB_CONFIG_PATH}/init.groovy.d/* ${CONFIG_PATH}/init.groovy.d/
+fi
+
+if [[ -d ${REPO_PATH}/init.groovy.d ]]; then
+  echo "  > Copying init.groovy.d from Repo"
+  mkdir -p ${CONFIG_PATH}/init.groovy.d
+  cp -R ${REPO_PATH}/init.groovy.d/* ${CONFIG_PATH}/init.groovy.d/
+fi
+
+# Cleanup
+rm -rf ${REPO_PATH}
+if [[ $USE_SSH -eq 1 ]]; then
+  echo "Cleaning up SSH config..."
+  rm -rf /root/.ssh
+  if [[ -d /root/.ssh_backup ]]; then
+    echo "Restoring pre-existing /root/.ssh directory..."
+    mv /root/.ssh_backup /root/.ssh
+  fi
+fi

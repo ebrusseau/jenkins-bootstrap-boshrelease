@@ -1,0 +1,7 @@
+---
+name: golang
+
+dependencies: []
+
+files:
+- golang/go-binary.tar.gz

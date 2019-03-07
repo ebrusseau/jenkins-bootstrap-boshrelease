@@ -1,0 +1,7 @@
+---
+name: oracle-jdk
+
+dependencies: []
+
+files:
+- oracle-jdk/oracle-jdk.tar.gz

@@ -1,0 +1,14 @@
+import hudson.security.HudsonPrivateSecurityRealm;
+
+println "Creating local accounts..."
+
+securityRealm = new HudsonPrivateSecurityRealm(false,false,null)
+if("<%= p('jenkins.admin.create') %>".equals("true")) {
+  println "  admin"
+  securityRealm.createAccount('<%= p('jenkins.admin.username') %>', '<%= p('jenkins.admin.password') %>')
+}
+
+if("<%= p('jenkins.agent.create') %>".equals("true")) {
+  println "  agent"
+  securityRealm.createAccount('<%= p('jenkins.agent.username') %>', '<%= p('jenkins.agent.password') %>')  
+}

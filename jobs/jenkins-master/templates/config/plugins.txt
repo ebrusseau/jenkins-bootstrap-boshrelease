@@ -1,0 +1,7 @@
+configuration-as-code:latest
+configuration-as-code-support:latest
+credentials:latest
+git:latest
+plain-credentials:latest
+ssh-credentials:latest
+swarm:latest

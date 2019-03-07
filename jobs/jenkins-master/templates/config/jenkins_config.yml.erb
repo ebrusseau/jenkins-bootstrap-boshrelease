@@ -1,0 +1,40 @@
+jenkins:
+  agentProtocols:
+  - "JNLP4-connect"
+  - "Ping"
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: false
+  disableRememberMe: false
+  mode: NORMAL
+  numExecutors: 2
+  primaryView:
+    all:
+      name: "all"
+  quietPeriod: 5
+  remotingSecurity:
+    enabled: true
+  scmCheckoutRetryCount: 0
+  slaveAgentPort: 50000
+  views:
+  - all:
+      name: "all"
+plugins:
+  sites:
+  - id: "default"
+    url: "https://updates.jenkins.io/update-center.json"
+security:
+  remotingCLI:
+    enabled: false
+unclassified:
+  location:
+    url: "http://<%= spec.ip %>:<%= p('jenkins.config.http_port') %>"
+tool:
+  git:
+    installations:
+    - name: "git"
+      home: "/var/vcap/packages/git-client/bin"
+  jdk:
+    installations:
+    - name: "jdk"
+      home: "/var/vcap/packages/oracle-jdk"

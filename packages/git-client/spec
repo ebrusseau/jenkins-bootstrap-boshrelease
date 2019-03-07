@@ -1,0 +1,7 @@
+---
+name: git-client
+
+dependencies: []
+
+files:
+- git-client/git-client-source.tar.gz

@@ -1,0 +1,7 @@
+---
+name: spruce
+
+dependencies: []
+
+files:
+- spruce/spruce-binary

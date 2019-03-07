@@ -1,0 +1,15 @@
+set -e # exit immediately if a simple command exits with a non-zero status
+set -u # report the usage of uninitialized variables
+
+# Available variables
+# $BOSH_COMPILE_TARGET - where this package & spec'd source files are available
+# $BOSH_INSTALL_TARGET - where you copy/install files to be included in package
+
+EXTRACTED_DIR=${BOSH_COMPILE_TARGET}/extracted
+mkdir -p ${EXTRACTED_DIR}
+unzip ${BOSH_COMPILE_TARGET}/apache-groovy/apache-groovy-binary.zip -d ${EXTRACTED_DIR}
+
+VERSIONED_DIR=$(find ${EXTRACTED_DIR} -maxdepth 1 ! -path ${EXTRACTED_DIR} -type d -exec basename {} \;)
+mv ${EXTRACTED_DIR}/${VERSIONED_DIR}/* ${BOSH_INSTALL_TARGET}
+
+mv ${BOSH_COMPILE_TARGET}/apache-groovy/snakeyaml.jar ${BOSH_INSTALL_TARGET}/lib/

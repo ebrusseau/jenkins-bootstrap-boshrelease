@@ -1,0 +1,8 @@
+---
+name: swarm-client
+
+dependencies:
+- oracle-jdk
+
+files:
+- swarm-client/swarm-client.jar

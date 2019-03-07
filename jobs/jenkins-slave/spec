@@ -1,0 +1,57 @@
+---
+name: jenkins-slave
+
+packages:
+- oracle-jdk
+- swarm-client
+- apache-maven
+- git-client
+- cf-cli
+- golang
+- apache-groovy
+
+consumes:
+- name: jenkins_master
+  type: jenkins
+  optional: true
+
+templates:
+  bin/jenkins-slave_ctl: bin/jenkins-slave_ctl
+  bin/pre-start: bin/pre-start
+  bin/common-functions: bin/common-functions
+  bin/drain.erb: bin/drain
+  bin/monit_debugger: bin/monit_debugger
+  data/properties.sh.erb: data/properties.sh
+  config/.gitconfig.erb: config/.gitconfig
+  helpers/ctl_setup.sh: helpers/ctl_setup.sh
+  helpers/ctl_utils.sh: helpers/ctl_utils.sh
+
+properties:
+  jenkins.gitconfig.name:
+    description: "Name used when commiting to a git repository"
+    default: "Jenkins CI"
+  jenkins.gitconfig.email:
+    description: "Email used when commiting to a git repository"
+    default: "jenkins@jenkinsci.local"
+  jenkins.slave.executors:
+    description: "The number of executors for this slave"
+    default: 2
+  jenkins.slave.labels:
+    description: "Labels to attach to the slave"
+    default: "build"
+  jenkins.slave.master_username:
+    description: "Username of the user to connect to the master server"
+  jenkins.slave.master_password:
+    description: "Password of the user to connect to the master server"
+  jenkins.slave.mode:
+    description: "The mode to run the slave"
+    default: "normal"
+  jenkins.slave.prefix:
+    description: "The prefix to use in the slave name"
+    default: "build"
+  jenkins.drain.enabled:
+    description: "Enables drain feature (EXPERIMENTAL)"
+    default: false
+  jenkins.drain.timeout:
+    description: "Time to wait in seconds before drain cancels running builds"
+    default: 600

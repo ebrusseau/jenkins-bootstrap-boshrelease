@@ -1,0 +1,79 @@
+---
+name: jenkins-master
+
+packages:
+- oracle-jdk
+- jenkins
+- git-client
+- apache-groovy
+- spruce
+
+provides:
+- name: jenkins_master
+  type: jenkins
+  properties:
+  - jenkins.admin.password
+  - jenkins.admin.username
+  - jenkins.agent.password
+  - jenkins.agent.username
+  - jenkins.config.http_port
+
+templates:
+  bin/backup.sh.erb: bin/bbr/backup
+  bin/drain.erb: bin/drain
+  bin/jenkins-master_ctl: bin/jenkins-master_ctl
+  bin/monit_debugger: bin/monit_debugger
+  bin/post-restore-unlock.sh.erb: bin/bbr/post-restore-unlock
+  bin/pre-restore-lock.sh.erb: bin/bbr/pre-restore-lock
+  bin/pre-start.erb: bin/pre-start
+  bin/restore.sh.erb: bin/bbr/restore
+  bin/install-plugins.sh.erb: bin/install-plugins
+  bin/process-configuration-repo.sh.erb: bin/process-configuration-repo
+  config/init.groovy.d/create-local-users.groovy.erb: config/init.groovy.d/create-local-users.groovy
+  config/jenkins_config.yml.erb: config/jenkins_config.yml
+  config/plugins.txt: config/plugins.txt
+  config/ssh/id_rsa.erb: config/ssh/id_rsa
+  config/ssh/config: config/ssh/config
+  data/properties.sh.erb: data/properties.sh
+  helpers/ctl_setup.sh: helpers/ctl_setup.sh
+  helpers/ctl_utils.sh: helpers/ctl_utils.sh
+properties:
+  jenkins.admin.create:
+    description: "True to create the admin user in the Jenkins database. False if this comes from an external source like LDAP"
+    default: false
+  jenkins.admin.password:
+    description: "Password for the admin user"
+    default: ""
+  jenkins.admin.username:
+    description: "User name for the admin user"
+    default: "admin"
+  jenkins.agent.create:
+    description: "True to create the admin user in the Jenkins database. False if this comes from an external source like LDAP"
+    default: false
+  jenkins.agent.password:
+    description: "Password for the agent user"
+    default: ""
+  jenkins.agent.username:
+    description: "User name for the agent user"
+    default: "agent"
+  jenkins.config.http_port:
+    description: "HTTP port to listen on"
+    default: 8080
+  jenkins.config.repo.enabled:
+    description: "Enables retrieving Jenkins configuration from a separate Git repository"
+    default: false
+  jenkins.config.repo.url:
+    description: "The Git repository that contains Jenkins configuration"
+    default: ""
+  jenkins.config.repo.branch:
+    description: "The repository branch to checkout"
+    default: "master"
+  jenkins.config.repo.ssh_key:
+    description: "The SSH private key to use when accessing the config repository"
+    default: ""
+  jenkins.drain.enabled:
+    description: "Enables drain feature (EXPERIMENTAL)"
+    default: false
+  jenkins.drain.timeout:
+    description: "Time to wait in seconds before drain cancels running builds"
+    default: 600
