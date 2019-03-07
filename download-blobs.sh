@@ -15,7 +15,7 @@ download_blob() {
   echo Downloading ${blob_name} from ${blob_url}...
   mkdir -p ${BLOBS_DIR}/${blob_dir}
   set -x
-  wget -q --show-progress "$@" -O ${BLOBS_DIR}/${blob_name} ${blob_url}
+  wget -q "$@" -O ${BLOBS_DIR}/${blob_name} ${blob_url}
   set +x
   bosh add-blob ${BLOBS_DIR}/${blob_name} ${blob_name}
 }
@@ -25,10 +25,13 @@ download_oracle_jdk_blob() {
   mkdir -p ${BLOBS_DIR}/oracle-jdk
   wget \
     --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-    -q --show-progress -O ${BLOBS_DIR}/oracle-jdk/oracle-jdk.tar.gz $1
+    -q -O ${BLOBS_DIR}/oracle-jdk/oracle-jdk.tar.gz $1
 
   [[ $? -eq 0 ]] && bosh add-blob ${BLOBS_DIR}/oracle-jdk/oracle-jdk.tar.gz oracle-jdk/oracle-jdk.tar.gz
 }
+
+rm -rf blobs
+echo "--- {}" > config/blobs.yml
 
 download_blob oracle-jdk/oracle-jdk.tar.gz "https://download.oracle.com/otn-pub/java/jdk/8u201-b09/42970487e3af4f5aa5bca3f542482c60/jdk-8u201-linux-x64.tar.gz" --header "Cookie: oraclelicense=accept-securebackup-cookie"
 download_blob apache-groovy/apache-groovy-binary.zip "https://dl.bintray.com/groovy/maven/apache-groovy-binary-2.5.6.zip"
