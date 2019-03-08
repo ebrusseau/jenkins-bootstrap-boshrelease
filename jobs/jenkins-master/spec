@@ -51,6 +51,9 @@ properties:
   jenkins.config.repo.branch:
     description: "The repository branch to checkout"
     default: "master"
+  jenkins.config.repo.path:
+    description: "The path within the repository that contains the configuration"
+    default: ""    
   jenkins.config.repo.ssh_key:
     description: "The SSH private key to use when accessing the config repository"
     default: ""

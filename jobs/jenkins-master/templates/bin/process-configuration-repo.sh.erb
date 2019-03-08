@@ -6,6 +6,7 @@ set -u # report the usage of uninitialized variables
 REPO_URL=<%= p('jenkins.config.repo.url') %>
 REPO_BRANCH=<%= p('jenkins.config.repo.branch') %>
 REPO_PATH=/var/vcap/data/jenkins-master/config-repo
+CONFIG_REPO_PATH=${REPO_PATH}<%= p('jenkins.config.repo.path' ) %>
 JOB_CONFIG_PATH=/var/vcap/jobs/jenkins-master/config
 CONFIG_PATH=/var/vcap/data/jenkins-master/config
 USE_SSH=0
@@ -47,21 +48,26 @@ echo "Cloning (shallow) configuration repository at ${REPO_URL}..."
 mkdir -p ${REPO_PATH}
 /var/vcap/packages/git-client/bin/git clone -b ${REPO_BRANCH} --depth 1 ${REPO_URL} ${REPO_PATH}
 
+if [[ ! -d ${CONFIG_REPO_PATH} ]]; then
+  echo "ERROR: Missing path in configuration repo: ${CONFIG_REPO_PATH}"
+  exit 1
+fi
+
 echo "Processing configuration repository:"
 
-if [[ -e ${REPO_PATH}/jenkins_config.yml ]]; then
+if [[ -e ${CONFIG_REPO_PATH}/jenkins_config.yml ]]; then
   echo "  > Merging jenkins_config.yml from Repo"
   /var/vcap/packages/spruce/bin/spruce merge \
     /var/vcap/data/jenkins-master/jenkins_config.yml \
-    ${REPO_PATH}/jenkins_config.yml \
+    ${CONFIG_REPO_PATH}/jenkins_config.yml \
     > ${CONFIG_PATH}/jenkins_config.yml
 
   cp ${CONFIG_PATH}/jenkins_config.yml /var/vcap/data/jenkins-master/jenkins_config.yml
 fi
 
-if [[ -e ${REPO_PATH}/plugins.txt ]]; then
+if [[ -e ${CONFIG_REPO_PATH}/plugins.txt ]]; then
   echo "  > Merging plugins.txt from Repo"
-  cat ${REPO_PATH}/plugins.txt \
+  cat ${CONFIG_REPO_PATH}/plugins.txt \
     ${JOB_CONFIG_PATH}/plugins.txt \
     | awk -F: '!($1 in plugins) {plugins[$1] = $2; print}' | sort > ${CONFIG_PATH}/plugins.txt
 else
@@ -75,10 +81,10 @@ if [[ -d ${JOB_CONFIG_PATH}/userContent ]]; then
   cp -R ${JOB_CONFIG_PATH}/userContent/* ${CONFIG_PATH}/userContent
 fi
 
-if [[ -d ${REPO_PATH}/userContent ]]; then
+if [[ -d ${CONFIG_REPO_PATH}/userContent ]]; then
   echo "  > Copying User Content from Repo"
   mkdir -p ${CONFIG_PATH}/userContent
-  cp -R ${REPO_PATH}/userContent/* ${CONFIG_PATH}/userContent/
+  cp -R ${CONFIG_REPO_PATH}/userContent/* ${CONFIG_PATH}/userContent/
 fi
 
 if [[ -d ${JOB_CONFIG_PATH}/init.groovy.d ]]; then
@@ -87,10 +93,10 @@ if [[ -d ${JOB_CONFIG_PATH}/init.groovy.d ]]; then
   cp -R ${JOB_CONFIG_PATH}/init.groovy.d/* ${CONFIG_PATH}/init.groovy.d/
 fi
 
-if [[ -d ${REPO_PATH}/init.groovy.d ]]; then
+if [[ -d ${CONFIG_REPO_PATH}/init.groovy.d ]]; then
   echo "  > Copying init.groovy.d from Repo"
   mkdir -p ${CONFIG_PATH}/init.groovy.d
-  cp -R ${REPO_PATH}/init.groovy.d/* ${CONFIG_PATH}/init.groovy.d/
+  cp -R ${CONFIG_REPO_PATH}/init.groovy.d/* ${CONFIG_PATH}/init.groovy.d/
 fi
 
 # Cleanup
