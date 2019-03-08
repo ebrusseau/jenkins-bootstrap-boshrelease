@@ -5,7 +5,7 @@ jenkins:
   crumbIssuer:
     standard:
       excludeClientIPFromCrumb: false
-  labelString: <%= p('jenkins.master.labels') %>
+  labelString: "<%= p('jenkins.master.labels', '') %>"
   mode: <%= p('jenkins.master.mode').upcase %>
   numExecutors: <%= p('jenkins.master.executors') %>
   remotingSecurity:
