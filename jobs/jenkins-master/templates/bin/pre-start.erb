@@ -16,8 +16,10 @@ echo "Merging jenkins.config.initial with base Jenkins CasC file..."
   > /var/vcap/data/jenkins-master/jenkins_config.yml
 
 echo
+echo "------------------------------------------------------------"
 echo "Initial config:"
 cat /var/vcap/data/jenkins-master/jenkins_config.yml
+echo "------------------------------------------------------------"
 echo
 
 if [[ ${REPO_ENABLED} == "true" ]]; then
@@ -35,6 +37,14 @@ echo "Merging jenkins.config.enforced with final Jenkins CasC file..."
   /var/vcap/data/jenkins-master/jenkins_config.yml \
   /var/vcap/jobs/jenkins-master/config/enforced_config.yml \
   > /var/vcap/store/jenkins-master/jenkins_config.yml
+
+echo
+echo "------------------------------------------------------------"
+echo "Final config:"
+cat /var/vcap/store/jenkins-master/jenkins_config.yml
+echo "------------------------------------------------------------"
+echo
+
 
 # Remove any existing groovy init scripts
 if [[ -d /var/vcap/store/jenkins-master/init.groovy.d ]]; then
