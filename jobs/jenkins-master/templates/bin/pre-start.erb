@@ -69,7 +69,7 @@ fi
 # TODO: Should disable/or remove plugins that aren't specified in plugins.txt
 OLDIFS=$IFS
 IFS=$'\n'
-DISABLEDPLUGINS=(<%= p('jenkins.plugins.disabled') %>)
+DISABLEDPLUGINS=(<%= p('jenkins.plugins.disable') %>)
 IFS=$OLDIFS
 for (( i=0; i<${#DISABLEDPLUGINS[@]}; i++ )); do
     echo "Disabling ${DISABLEDPLUGINS[$i]} plugin"

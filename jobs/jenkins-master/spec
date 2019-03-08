@@ -82,7 +82,7 @@ properties:
   jenkins.drain.password:
     description: "Password for the user used to drain builds"
     default: ""
-  jenkins.plugins.disabled:
+  jenkins.plugins.disable:
     description: "List of installed plugins to be disabled"
     default: ""
   jenkins.plugins.install:

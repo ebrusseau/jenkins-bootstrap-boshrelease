@@ -5,4 +5,8 @@
     url: ((repo_url))
     branch: ((repo_branch))
     path: ((repo_path))
-    ssh_key: ((repo_ssh_key))
+    ssh_key: ((repo_ssh.private_key))
+
+- type: replace
+  path: /variables/name=repo_ssh?/type
+  value: ssh
