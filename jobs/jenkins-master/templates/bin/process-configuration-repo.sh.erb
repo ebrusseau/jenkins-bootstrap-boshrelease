@@ -46,7 +46,7 @@ if [[ -z $(echo ${REPO_URL} | grep "http") ]]; then
   chmod 0600 /root/.ssh/*
 fi
 
-echo "Cloning (shallow) configuration repository at ${REPO_URL}..."
+echo "Cloning (shallow) configuration repository at ${REPO_URL} using branch ${REPO_BRANCH}..."
 mkdir -p ${GIT_REPO}
 /var/vcap/packages/git-client/bin/git clone -b ${REPO_BRANCH} --depth 1 ${REPO_URL} ${GIT_REPO}
 
@@ -55,6 +55,7 @@ if [[ -n ${REPO_PATH} ]]; then
   if [[ ${REPO_PATH:0:1} != "/" ]]; then
     REPO_PATH=/${REPO_PATH}
   fi
+  echo "Will look for configuration files in path ${REPO_PATH} of repository..."
   CONFIG_REPO="${CONFIG_REPO}${REPO_PATH}"
 fi
 

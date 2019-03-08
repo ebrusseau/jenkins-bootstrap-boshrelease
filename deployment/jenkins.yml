@@ -1,4 +1,4 @@
-name: jenkins
+name: ((deployment_name))
 instance_groups:
 - name: jenkins-master
   azs: [z1]
