@@ -111,8 +111,7 @@ if [[ -d ${CONFIG_REPO}/init.groovy.d ]]; then
   cp -R ${CONFIG_REPO}/init.groovy.d/* ${FINAL_CONFIG}/init.groovy.d/
 fi
 
-# Cleanup
-rm -rf ${GIT_REPO}
+# Cleanup SSH
 if [[ $USE_SSH -eq 1 ]]; then
   echo "Cleaning up SSH config..."
   rm -rf /root/.ssh
