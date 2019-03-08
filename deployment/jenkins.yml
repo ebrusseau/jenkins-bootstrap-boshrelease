@@ -20,8 +20,8 @@ instance_groups:
     properties:
       jenkins:
         slave:
-          master_username: agent
-          master_password: ((jenkins_agent_password))
+          username: ((slave_username))
+          password: ((slave_password))
   - name: docker
     release: docker
     properties:

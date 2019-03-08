@@ -39,9 +39,9 @@ properties:
   jenkins.slave.labels:
     description: "Labels to attach to the slave"
     default: "build"
-  jenkins.slave.master_username:
+  jenkins.slave.username:
     description: "Username of the user to connect to the master server"
-  jenkins.slave.master_password:
+  jenkins.slave.password:
     description: "Password of the user to connect to the master server"
   jenkins.slave.mode:
     description: "The mode to run the slave"
