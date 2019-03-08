@@ -5,3 +5,4 @@
     url: ((repo_url))
     branch: ((repo_branch))
     path: ((repo_path))
+    ssh_key: ((repo_ssh_key))
