@@ -2,7 +2,7 @@
 
 # job template binding variables
 <% if_link('jenkins_master') do |jenkins_master| %>
-JENKINS_URL=http://<%= link('jenkins_master').instances[0].address %>:<%= link('jenkins_master').p('jenkins.http_port') %>
+JENKINS_URL=http://<%= link('jenkins_master').instances[0].address %>:<%= link('jenkins_master').p('jenkins.master.http_port') %>
 
 # job name & index of this VM within cluster
 # e.g. JOB_NAME=redis, JOB_INDEX=0

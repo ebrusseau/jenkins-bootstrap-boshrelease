@@ -1,0 +1,19 @@
+- type: remove
+  path: /instance_groups/name=jenkins-slave
+
+- type: remove
+  path: /variables/name=docker-ca
+
+- type: remove
+  path: /variables/name=docker-tls
+
+- type: remove
+  path: /releases/name=docker
+
+- type: replace
+  path: /instance_groups/name=jenkins-master/jobs/name=jenkins-master/properties?/jenkins/master/mode
+  value: "NORMAL"
+
+- type: replace
+  path: /instance_groups/name=jenkins-master/jobs/name=jenkins-master/properties?/jenkins/master/executors
+  value: 2
