@@ -1,3 +1,2 @@
 matrix-auth:latest
-matrix-project:latest
 simple-theme-plugin:latest

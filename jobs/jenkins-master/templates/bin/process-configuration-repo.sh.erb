@@ -5,10 +5,11 @@ set -u # report the usage of uninitialized variables
 
 REPO_URL=<%= p('jenkins.config.repo.url') %>
 REPO_BRANCH=<%= p('jenkins.config.repo.branch') %>
-REPO_PATH=/var/vcap/data/jenkins-master/config-repo
-CONFIG_REPO_PATH=${REPO_PATH}<%= p('jenkins.config.repo.path' ) %>
-JOB_CONFIG_PATH=/var/vcap/jobs/jenkins-master/config
-CONFIG_PATH=/var/vcap/data/jenkins-master/config
+REPO_PATH=<%= p('jenkins.config.repo.path' ) %>
+GIT_REPO=/var/vcap/data/jenkins-master/config-repo
+CONFIG_REPO=${GIT_REPO}
+JOB_CONFIG=/var/vcap/jobs/jenkins-master/config
+FINAL_CONFIG=/var/vcap/data/jenkins-master/config
 USE_SSH=0
 
 if [[ -z "${REPO_URL}" ]]; then
@@ -16,14 +17,15 @@ if [[ -z "${REPO_URL}" ]]; then
   exit 1
 fi
 
-if [[ -d ${REPO_PATH} ]]; then
-  rm -rf ${REPO_PATH}
+if [[ -d ${GIT_REPO} ]]; then
+  rm -rf ${GIT_REPO}
 fi
 
-if [[ -d ${CONFIG_PATH} ]]; then
-  rm -rf ${CONFIG_PATH}
+if [[ -d ${FINAL_CONFIG} ]]; then
+  rm -rf ${FINAL_CONFIG}
 fi
-mkdir -p ${CONFIG_PATH}
+mkdir -p ${FINAL_CONFIG}
+
 
 # Copy SSH config
 if [[ -z $(echo ${REPO_URL} | grep "http") ]]; then
@@ -45,62 +47,71 @@ if [[ -z $(echo ${REPO_URL} | grep "http") ]]; then
 fi
 
 echo "Cloning (shallow) configuration repository at ${REPO_URL}..."
-mkdir -p ${REPO_PATH}
-/var/vcap/packages/git-client/bin/git clone -b ${REPO_BRANCH} --depth 1 ${REPO_URL} ${REPO_PATH}
+mkdir -p ${GIT_REPO}
+/var/vcap/packages/git-client/bin/git clone -b ${REPO_BRANCH} --depth 1 ${REPO_URL} ${GIT_REPO}
 
-if [[ ! -d ${CONFIG_REPO_PATH} ]]; then
-  echo "ERROR: Missing path in configuration repo: ${CONFIG_REPO_PATH}"
+# Normalize and appent repo path
+if [[ -n ${REPO_PATH} ]]; then
+  if [[ ${REPO_PATH:0:1} != "/" ]]; then
+    REPO_PATH=/${REPO_PATH}
+  fi
+  CONFIG_REPO="${CONFIG_REPO}${REPO_PATH}"
+fi
+
+echo "Using configuration from ${CONFIG_REPO}..."
+if [[ ! -d ${CONFIG_REPO} ]]; then
+  echo "ERROR: Path not found"
   exit 1
 fi
 
 echo "Processing configuration repository:"
 
-if [[ -e ${CONFIG_REPO_PATH}/jenkins_config.yml ]]; then
+if [[ -e ${CONFIG_REPO}/jenkins_config.yml ]]; then
   echo "  > Merging jenkins_config.yml from Repo"
   /var/vcap/packages/spruce/bin/spruce merge \
     /var/vcap/data/jenkins-master/jenkins_config.yml \
-    ${CONFIG_REPO_PATH}/jenkins_config.yml \
-    > ${CONFIG_PATH}/jenkins_config.yml
+    ${CONFIG_REPO}/jenkins_config.yml \
+    > ${FINAL_CONFIG}/jenkins_config.yml
 
-  cp ${CONFIG_PATH}/jenkins_config.yml /var/vcap/data/jenkins-master/jenkins_config.yml
+  cp ${FINAL_CONFIG}/jenkins_config.yml /var/vcap/data/jenkins-master/jenkins_config.yml
 fi
 
-if [[ -e ${CONFIG_REPO_PATH}/plugins.txt ]]; then
+if [[ -e ${CONFIG_REPO}/plugins.txt ]]; then
   echo "  > Merging plugins.txt from Repo"
-  cat ${CONFIG_REPO_PATH}/plugins.txt \
-    ${JOB_CONFIG_PATH}/plugins.txt \
-    | awk -F: '!($1 in plugins) {plugins[$1] = $2; print}' | sort > ${CONFIG_PATH}/plugins.txt
+  cat ${CONFIG_REPO}/plugins.txt \
+    ${JOB_CONFIG}/plugins.txt \
+    | awk -F: '!($1 in plugins) {plugins[$1] = $2; print}' | sort > ${FINAL_CONFIG}/plugins.txt
 else
   echo "  > Copying plugins.txt from Job"
-  cp ${JOB_CONFIG_PATH}/plugins.txt ${CONFIG_PATH}/plugins.txt
+  cp ${JOB_CONFIG}/plugins.txt ${FINAL_CONFIG}/plugins.txt
 fi
 
-if [[ -d ${JOB_CONFIG_PATH}/userContent ]]; then
+if [[ -d ${JOB_CONFIG}/userContent ]]; then
   echo "  > Copying User Content from Job"
-  mkdir -p ${CONFIG_PATH}/userContent
-  cp -R ${JOB_CONFIG_PATH}/userContent/* ${CONFIG_PATH}/userContent
+  mkdir -p ${FINAL_CONFIG}/userContent
+  cp -R ${JOB_CONFIG}/userContent/* ${FINAL_CONFIG}/userContent
 fi
 
-if [[ -d ${CONFIG_REPO_PATH}/userContent ]]; then
+if [[ -d ${CONFIG_REPO}/userContent ]]; then
   echo "  > Copying User Content from Repo"
-  mkdir -p ${CONFIG_PATH}/userContent
-  cp -R ${CONFIG_REPO_PATH}/userContent/* ${CONFIG_PATH}/userContent/
+  mkdir -p ${FINAL_CONFIG}/userContent
+  cp -R ${CONFIG_REPO}/userContent/* ${FINAL_CONFIG}/userContent/
 fi
 
-if [[ -d ${JOB_CONFIG_PATH}/init.groovy.d ]]; then
+if [[ -d ${JOB_CONFIG}/init.groovy.d ]]; then
   echo "  > Copying init.groovy.d from Job"
-  mkdir -p ${CONFIG_PATH}/init.groovy.d
-  cp -R ${JOB_CONFIG_PATH}/init.groovy.d/* ${CONFIG_PATH}/init.groovy.d/
+  mkdir -p ${FINAL_CONFIG}/init.groovy.d
+  cp -R ${JOB_CONFIG}/init.groovy.d/* ${FINAL_CONFIG}/init.groovy.d/
 fi
 
-if [[ -d ${CONFIG_REPO_PATH}/init.groovy.d ]]; then
+if [[ -d ${CONFIG_REPO}/init.groovy.d ]]; then
   echo "  > Copying init.groovy.d from Repo"
-  mkdir -p ${CONFIG_PATH}/init.groovy.d
-  cp -R ${CONFIG_REPO_PATH}/init.groovy.d/* ${CONFIG_PATH}/init.groovy.d/
+  mkdir -p ${FINAL_CONFIG}/init.groovy.d
+  cp -R ${CONFIG_REPO}/init.groovy.d/* ${FINAL_CONFIG}/init.groovy.d/
 fi
 
 # Cleanup
-rm -rf ${REPO_PATH}
+rm -rf ${GIT_REPO}
 if [[ $USE_SSH -eq 1 ]]; then
   echo "Cleaning up SSH config..."
   rm -rf /root/.ssh
