@@ -25,6 +25,11 @@ if [[ ${REPO_ENABLED} == "true" ]]; then
   /var/vcap/jobs/jenkins-master/bin/process-configuration-repo
 fi
 
+if [[ -e /var/vcap/store/jenkins-master/config.xml ]]; then
+  echo "Removing stale config.xml file..."
+  rm -f /var/vcap/store/jenkins-master/config.xml
+fi
+
 echo "Copying Jenkins CasC dile to Jenkins home directory..."
 cp /var/vcap/data/jenkins-master/jenkins_config.yml /var/vcap/store/jenkins-master/jenkins_config.yml
 
