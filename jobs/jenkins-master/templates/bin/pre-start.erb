@@ -4,27 +4,29 @@ set -e # exit immediately if a simple command exits with a non-zero status
 set -u # report the usage of uninitialized variables
 
 CONFIG_PATH=/var/vcap/jobs/jenkins-master/config
+REPO_ENABLED="<%= p('jenkins.config.repo.enabled') %>"
 
 source /var/vcap/jobs/jenkins-master/data/properties.sh
 mkdir -p /var/vcap/store/jenkins-master
 
-if [[ "<%= p('jenkins.config.repo.enabled') %>" == "true" ]]; then
-  CONFIG_PATH=/var/vcap/data/jenkins-config
+echo "Merging jenkins.config.initial with Jenkins CasC file..."
+/var/vcap/packages/spruce/bin/spruce merge \
+  /var/vcap/jobs/jenkins-master/config/jenkins_config.yml \
+  /var/vcap/jobs/jenkins-master/config/initial_config.yml \
+  > /var/vcap/data/jenkins-master/jenkins_config.yml
+
+echo
+echo "Initial config:"
+cat /var/vcap/data/jenkins-master/jenkins_config.yml
+echo
+
+if [[ ${REPO_ENABLED} == "true" ]]; then
+  CONFIG_PATH=/var/vcap/data/jenkins-master/config
   /var/vcap/jobs/jenkins-master/bin/process-configuration-repo
 fi
 
-# Install (or remove) Jenkins CasC file
-if [[ -f ${CONFIG_PATH}/jenkins_config.yml ]]; then
-  echo "Copying Jenkins Configuration as Code file to Jenkins home directory..."
-  cp ${CONFIG_PATH}/jenkins_config.yml /var/vcap/store/jenkins-master/jenkins_config.yml
-
-  if [[ -e /var/vcap/store/jenkins-master/config.xml ]]; then
-    echo "Removing existing config.xml file..."
-    rm -f /var/vcap/store/jenkins-master/config.xml
-  fi
-elif [[ -f /var/vcap/store/jenkins-master/jenkins_config.yml ]]; then
-  rm -f /var/vcap/store/jenkins-master/jenkins_config.yml
-fi
+echo "Copying Jenkins CasC dile to Jenkins home directory..."
+cp /var/vcap/data/jenkins-master/jenkins_config.yml /var/vcap/store/jenkins-master/jenkins_config.yml
 
 # Remove any existing groovy init scripts
 if [[ -d /var/vcap/store/jenkins-master/init.groovy.d ]]; then
@@ -38,26 +40,26 @@ if [[ -d ${CONFIG_PATH}/init.groovy.d ]]; then
     cp ${CONFIG_PATH}/init.groovy.d/*.groovy /var/vcap/store/jenkins-master/init.groovy.d/
 fi
 
-# Remove existing plugins
-# TODO: Smarter logic required here to prevent download all plugins every time;
-# (e.g. delete those that are not in the plugins.txt file)
-if [[ -d /var/vcap/store/jenkins-master/plugins ]]; then
-  rm -rf /var/vcap/store/jenkins-master/plugins
-fi
-mkdir -p /var/vcap/store/jenkins-master/plugins
-
 # Handle plugins
+mkdir -p /var/vcap/store/jenkins-master/plugins
 if [[ -f ${CONFIG_PATH}/plugins.txt ]]; then
-  echo "Configuring Plugins..."
+  echo "Installing Plugins..."
   /var/vcap/jobs/jenkins-master/bin/install-plugins < ${CONFIG_PATH}/plugins.txt
 fi
 
-# add disabled plugin list
+# Disable plugins specified at runtime
+# TODO: Should disable/or remove plugins that aren't specified in plugins.txt
+OLDIFS=$IFS
+IFS=$'\n'
+DISABLEDPLUGINS=(<%= p('jenkins.plugins.disabled') %>)
+IFS=$OLDIFS
+for (( i=0; i<${#DISABLEDPLUGINS[@]}; i++ )); do
+    echo "Disabling ${DISABLEDPLUGINS[$i]} plugin"
+    touch /var/vcap/store/jenkins-master/plugins/${DISABLEDPLUGINS[$i]}.jpi.disabled
+done
+
+# Always disabled plugin list (e.g. unsupported in this deployment)
 touch /var/vcap/store/jenkins-master/plugins/windows-slaves.jpi.disabled
-touch /var/vcap/store/jenkins-master/plugins/subversion.jpi.disabled
-touch /var/vcap/store/jenkins-master/plugins/cvs.jpi.disabled
-touch /var/vcap/store/jenkins-master/plugins/ant.jpi.disabled
-touch /var/vcap/store/jenkins-master/plugins/translation.jpi.disabled
 
 # Remove any existing User Content
 if [[ -d /var/vcap/store/jenkins-master/userContent ]]; then

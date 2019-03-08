@@ -30,8 +30,9 @@ templates:
   bin/install-plugins.sh.erb: bin/install-plugins
   bin/process-configuration-repo.sh.erb: bin/process-configuration-repo
   config/init.groovy.d/create-local-users.groovy.erb: config/init.groovy.d/create-local-users.groovy
+  config/initial_config.yml.erb: config/initial_config.yml
   config/jenkins_config.yml.erb: config/jenkins_config.yml
-  config/plugins.txt: config/plugins.txt
+  config/plugins.txt.erb: config/plugins.txt
   config/ssh/id_rsa.erb: config/ssh/id_rsa
   config/ssh/config: config/ssh/config
   data/properties.sh.erb: data/properties.sh
@@ -59,6 +60,9 @@ properties:
   jenkins.config.http_port:
     description: "HTTP port to listen on"
     default: 8080
+  jenkins.config.initial:
+    description: "Extra YAML elements that are merged into the initial CASC file"
+    default: "jenkins:"
   jenkins.config.repo.enabled:
     description: "Enables retrieving Jenkins configuration from a separate Git repository"
     default: false
@@ -77,3 +81,9 @@ properties:
   jenkins.drain.timeout:
     description: "Time to wait in seconds before drain cancels running builds"
     default: 600
+  jenkins.plugins.disabled:
+    description: "List of installed plugins to be disabled"
+    default: ""
+  jenkins.plugins.install:
+    description: "List of plugins to be installed"
+    default: ""

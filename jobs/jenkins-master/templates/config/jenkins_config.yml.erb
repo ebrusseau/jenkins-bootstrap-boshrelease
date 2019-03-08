@@ -5,20 +5,9 @@ jenkins:
   crumbIssuer:
     standard:
       excludeClientIPFromCrumb: false
-  disableRememberMe: false
-  mode: NORMAL
-  numExecutors: 2
-  primaryView:
-    all:
-      name: "all"
-  quietPeriod: 5
   remotingSecurity:
     enabled: true
-  scmCheckoutRetryCount: 0
   slaveAgentPort: 50000
-  views:
-  - all:
-      name: "all"
 plugins:
   sites:
   - id: "default"

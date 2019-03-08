@@ -14,9 +14,7 @@ download_blob() {
 
   echo Downloading ${blob_name} from ${blob_url}...
   mkdir -p ${BLOBS_DIR}/${blob_dir}
-  set -x
-  wget -q "$@" -O ${BLOBS_DIR}/${blob_name} ${blob_url}
-  set +x
+  wget "$@" -O ${BLOBS_DIR}/${blob_name} ${blob_url}
   bosh add-blob ${BLOBS_DIR}/${blob_name} ${blob_name}
 }
 
@@ -25,7 +23,7 @@ download_oracle_jdk_blob() {
   mkdir -p ${BLOBS_DIR}/oracle-jdk
   wget \
     --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-    -q -O ${BLOBS_DIR}/oracle-jdk/oracle-jdk.tar.gz $1
+    -O ${BLOBS_DIR}/oracle-jdk/oracle-jdk.tar.gz $1
 
   [[ $? -eq 0 ]] && bosh add-blob ${BLOBS_DIR}/oracle-jdk/oracle-jdk.tar.gz oracle-jdk/oracle-jdk.tar.gz
 }

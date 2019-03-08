@@ -1,5 +1,5 @@
 ---
-name: jenkins
+name: jenkins-bootstrap
 blobstore:
   provider: local
   options:

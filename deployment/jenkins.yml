@@ -5,7 +5,7 @@ instance_groups:
   instances: 1
   jobs:
   - name: jenkins-master
-    release: jenkins
+    release: jenkins-bootstrap
     properties:
       jenkins:
         admin:
@@ -30,7 +30,7 @@ instance_groups:
   instances: 1
   jobs:
   - name: jenkins-slave
-    release: jenkins
+    release: jenkins-bootstrap
     properties:
       jenkins:
         slave:
@@ -49,7 +49,7 @@ instance_groups:
   vm_type: default
 
 releases:
-- name: jenkins
+- name: jenkins-bootstrap
   version: latest
 - name: docker
   version: 32.0.0

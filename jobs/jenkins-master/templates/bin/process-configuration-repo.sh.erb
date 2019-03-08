@@ -5,12 +5,9 @@ set -u # report the usage of uninitialized variables
 
 REPO_URL=<%= p('jenkins.config.repo.url') %>
 REPO_BRANCH=<%= p('jenkins.config.repo.branch') %>
-REPO_PATH=/var/vcap/data/jenkins-config-repo
+REPO_PATH=/var/vcap/data/jenkins-master/config-repo
 JOB_CONFIG_PATH=/var/vcap/jobs/jenkins-master/config
-CONFIG_PATH=/var/vcap/data/jenkins-config
-
-GIT_BINARY=/var/vcap/packages/git-client/bin/git
-SPRUCE_BINARY=/var/vcap/packages/spruce/bin/spruce
+CONFIG_PATH=/var/vcap/data/jenkins-master/config
 USE_SSH=0
 
 if [[ -z "${REPO_URL}" ]]; then
@@ -48,34 +45,26 @@ fi
 
 echo "Cloning (shallow) configuration repository at ${REPO_URL}..."
 mkdir -p ${REPO_PATH}
-${GIT_BINARY} clone -b ${REPO_BRANCH} --depth 1 ${REPO_URL} ${REPO_PATH}
+/var/vcap/packages/git-client/bin/git clone -b ${REPO_BRANCH} --depth 1 ${REPO_URL} ${REPO_PATH}
 
 echo "Processing configuration repository:"
 
 if [[ -e ${REPO_PATH}/jenkins_config.yml ]]; then
-  if [[ -e ${JOB_CONFIG_PATH}/jenkins_config.yml ]]; then
-    echo "  > Merging jenkins_config.yml"
-    ${SPRUCE_BINARY} merge ${JOB_CONFIG_PATH}/jenkins_config.yml ${REPO_PATH}/jenkins_config.yml > ${CONFIG_PATH}/jenkins_config.yml
-  else
-    echo "  > Copying jenkins_config.yml from Repo"
-    cp ${REPO_PATH}/jenkins_config.yml ${CONFIG_PATH}/jenkins_config.yml
-  fi
-elif [[ -e ${JOB_CONFIG_PATH}/jenkins_config.yml ]]; then
-  echo "  > Copying jenkins_config.yml from Job"
-  cp ${JOB_CONFIG_PATH}/jenkins_config.yml ${CONFIG_PATH}/jenkins_config.yml
+  echo "  > Merging jenkins_config.yml from Repo"
+  /var/vcap/packages/spruce/bin/spruce merge \
+    /var/vcap/data/jenkins-master/jenkins_config.yml \
+    ${REPO_PATH}/jenkins_config.yml \
+    > ${CONFIG_PATH}/jenkins_config.yml
+
+  cp ${CONFIG_PATH}/jenkins_config.yml /var/vcap/data/jenkins-master/jenkins_config.yml
 fi
 
 if [[ -e ${REPO_PATH}/plugins.txt ]]; then
-  if [[ -e ${JOB_CONFIG_PATH}/plugins.txt ]]; then
-    echo "  > Merging plugins.txt"
-    cat ${REPO_PATH}/plugins.txt \
-      ${JOB_CONFIG_PATH}/plugins.txt \
-      | awk -F: '!($1 in plugins) {plugins[$1] = $2; print}' | sort > ${CONFIG_PATH}/plugins.txt
-  else
-    echo "  > Copying plugins.txt from Repo"
-    cp ${REPO_PATH}/plugins.txt ${CONFIG_PATH}/plugins.txt
-  fi
-elif [[ -e ${JOB_CONFIG_PATH}/plugins.txt ]]; then
+  echo "  > Merging plugins.txt from Repo"
+  cat ${REPO_PATH}/plugins.txt \
+    ${JOB_CONFIG_PATH}/plugins.txt \
+    | awk -F: '!($1 in plugins) {plugins[$1] = $2; print}' | sort > ${CONFIG_PATH}/plugins.txt
+else
   echo "  > Copying plugins.txt from Job"
   cp ${JOB_CONFIG_PATH}/plugins.txt ${CONFIG_PATH}/plugins.txt
 fi
