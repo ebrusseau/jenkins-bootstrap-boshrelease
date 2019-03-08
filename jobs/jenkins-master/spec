@@ -27,6 +27,7 @@ templates:
   bin/restore.sh.erb: bin/bbr/restore
   bin/install-plugins.sh.erb: bin/install-plugins
   bin/process-configuration-repo.sh.erb: bin/process-configuration-repo
+  config/enforced_config.yml.erb: config/enforced_config.yml
   config/initial_config.yml.erb: config/initial_config.yml
   config/jenkins_config.yml.erb: config/jenkins_config.yml
   config/plugins.txt.erb: config/plugins.txt
@@ -48,8 +49,11 @@ properties:
   jenkins.master.executors:
     description: "The number of executors for the master"
     default: 0
+  jenkins.config.enforced:
+    description: "Extra YAML elements that are merged into the running CASC file after the config repo is merged"
+    default: "jenkins:"
   jenkins.config.initial:
-    description: "Extra YAML elements that are merged into the initial CASC file"
+    description: "Extra YAML elements that are merged into the base CASC file before the config repo is merged"
     default: "jenkins:"
   jenkins.config.repo.enabled:
     description: "Enables retrieving Jenkins configuration from a separate Git repository"

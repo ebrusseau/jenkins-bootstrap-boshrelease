@@ -9,7 +9,7 @@ REPO_ENABLED="<%= p('jenkins.config.repo.enabled') %>"
 source /var/vcap/jobs/jenkins-master/data/properties.sh
 mkdir -p /var/vcap/store/jenkins-master
 
-echo "Merging jenkins.config.initial with Jenkins CasC file..."
+echo "Merging jenkins.config.initial with base Jenkins CasC file..."
 /var/vcap/packages/spruce/bin/spruce merge \
   /var/vcap/jobs/jenkins-master/config/jenkins_config.yml \
   /var/vcap/jobs/jenkins-master/config/initial_config.yml \
@@ -30,8 +30,11 @@ if [[ -e /var/vcap/store/jenkins-master/config.xml ]]; then
   rm -f /var/vcap/store/jenkins-master/config.xml
 fi
 
-echo "Copying Jenkins CasC dile to Jenkins home directory..."
-cp /var/vcap/data/jenkins-master/jenkins_config.yml /var/vcap/store/jenkins-master/jenkins_config.yml
+echo "Merging jenkins.config.enforced with final Jenkins CasC file..."
+/var/vcap/packages/spruce/bin/spruce merge \
+  /var/vcap/data/jenkins-master/jenkins_config.yml \
+  /var/vcap/jobs/jenkins-master/config/enforced_config.yml \
+  > /var/vcap/store/jenkins-master/jenkins_config.yml
 
 # Remove any existing groovy init scripts
 if [[ -d /var/vcap/store/jenkins-master/init.groovy.d ]]; then
