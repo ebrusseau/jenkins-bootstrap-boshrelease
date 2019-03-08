@@ -1,0 +1,10 @@
+jenkins:
+  securityRealm:
+    local:
+      allowsSignup: false
+      enableCaptcha: false
+      users:
+        - id: "admin"
+          password: ((jenkins_admin_password))
+        - id: "agent"
+          password: ((jenkins_agent_password))

@@ -6,34 +6,6 @@ instance_groups:
   jobs:
   - name: jenkins-master
     release: jenkins-bootstrap
-    properties:
-      jenkins:
-        config:
-          repo:
-            enabled: true
-            url: https://github.com/ebrusseau/jenkins-bootstrap-config.git
-            branch: testing
-            # ssh_key: ((jenkins_config_repo_ssh.private_key))
-          initial: |
-            jenkins:
-              securityRealm:
-                local:
-                  allowsSignup: false
-                  users:
-                    - id: "admin"
-                      password: ((jenkins_admin_password))
-                    - id: "agent"
-                      password: ((jenkins_agent_password))
-            credentials:
-              system:
-                domainCredentials:
-                  - credentials:
-                      - usernamePassword:
-                          scope: GLOBAL
-                          id: "my-creds"
-                          username: "some-user"
-                          password: "some-password"
-                          description: "Username/Password Credentials for something"
   networks:
   - name: default
   stemcell: default
@@ -94,9 +66,3 @@ variables:
     common_name: docker
     extended_key_usage:
     - client_auth
-- name: jenkins_admin_password
-  type: password
-- name: jenkins_agent_password
-  type: password
-- name: jenkins_config_repo_ssh
-  type: ssh

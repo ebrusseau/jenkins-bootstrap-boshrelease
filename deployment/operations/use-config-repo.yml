@@ -1,0 +1,7 @@
+- type: replace
+  path: /instance_groups/name=jenkins-master/jobs/name=jenkins-master/properties?/jenkins/config/repo
+  value:
+    enabled: true
+    url: ((repo_url))
+    branch: ((repo_branch))
+    path: ((repo_path))

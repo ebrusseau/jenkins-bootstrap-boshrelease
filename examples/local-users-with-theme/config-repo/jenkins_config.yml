@@ -1,0 +1,19 @@
+jenkins:
+  authorizationStrategy:
+    projectMatrix:
+      grantedPermissions:
+      - "Agent/Build:agent"
+      - "Agent/Configure:agent"
+      - "Agent/Connect:agent"
+      - "Agent/Create:agent"
+      - "Agent/Delete:agent"
+      - "Agent/Disconnect:agent"
+      - "Overall/Administer:admin"
+      - "Job/Discover:anonymous"
+      - "Overall/Read:anonymous"
+  disableRememberMe: true
+unclassified:
+  simple-theme-plugin:
+    elements:
+    - cssUrl:
+        url: "/userContent/branding.css"
