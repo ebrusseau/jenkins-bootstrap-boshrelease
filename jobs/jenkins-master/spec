@@ -51,10 +51,10 @@ properties:
     default: 0
   jenkins.config.enforced:
     description: "Extra YAML elements that are merged into the running CASC file after the config repo is merged"
-    default: "jenkins:"
+    default: "--- {}"
   jenkins.config.initial:
     description: "Extra YAML elements that are merged into the base CASC file before the config repo is merged"
-    default: "jenkins:"
+    default: "--- {}"
   jenkins.config.repo.enabled:
     description: "Enables retrieving Jenkins configuration from a separate Git repository"
     default: false
