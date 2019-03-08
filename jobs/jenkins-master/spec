@@ -12,11 +12,9 @@ provides:
 - name: jenkins_master
   type: jenkins
   properties:
-  - jenkins.admin.password
-  - jenkins.admin.username
-  - jenkins.agent.password
-  - jenkins.agent.username
-  - jenkins.config.http_port
+  - jenkins.drain.password
+  - jenkins.drain.username
+  - jenkins.http_port
 
 templates:
   bin/backup.sh.erb: bin/bbr/backup
@@ -29,7 +27,6 @@ templates:
   bin/restore.sh.erb: bin/bbr/restore
   bin/install-plugins.sh.erb: bin/install-plugins
   bin/process-configuration-repo.sh.erb: bin/process-configuration-repo
-  config/init.groovy.d/create-local-users.groovy.erb: config/init.groovy.d/create-local-users.groovy
   config/initial_config.yml.erb: config/initial_config.yml
   config/jenkins_config.yml.erb: config/jenkins_config.yml
   config/plugins.txt.erb: config/plugins.txt
@@ -39,25 +36,7 @@ templates:
   helpers/ctl_setup.sh: helpers/ctl_setup.sh
   helpers/ctl_utils.sh: helpers/ctl_utils.sh
 properties:
-  jenkins.admin.create:
-    description: "True to create the admin user in the Jenkins database. False if this comes from an external source like LDAP"
-    default: false
-  jenkins.admin.password:
-    description: "Password for the admin user"
-    default: ""
-  jenkins.admin.username:
-    description: "User name for the admin user"
-    default: "admin"
-  jenkins.agent.create:
-    description: "True to create the admin user in the Jenkins database. False if this comes from an external source like LDAP"
-    default: false
-  jenkins.agent.password:
-    description: "Password for the agent user"
-    default: ""
-  jenkins.agent.username:
-    description: "User name for the agent user"
-    default: "agent"
-  jenkins.config.http_port:
+  jenkins.http_port:
     description: "HTTP port to listen on"
     default: 8080
   jenkins.config.initial:
@@ -81,6 +60,12 @@ properties:
   jenkins.drain.timeout:
     description: "Time to wait in seconds before drain cancels running builds"
     default: 600
+  jenkins.drain.username:
+    description: "Name of the user used to drain builds (needs API access)"
+    default: "admin"
+  jenkins.drain.password:
+    description: "Password for the user used to drain builds"
+    default: ""
   jenkins.plugins.disabled:
     description: "List of installed plugins to be disabled"
     default: ""

@@ -4,9 +4,9 @@ set -eo pipefail
 
 if [ "<%= p('jenkins.drain.enabled') %>" = "false" ]; then echo 0; exit 0; fi
 
-JENKINS_URL=http://<%= spec.ip %>:<%= p('jenkins.config.http_port') %>
-USERNAME=<%= p('jenkins.admin.username') %>
-TOKEN=<%= p('jenkins.admin.password') %>
+JENKINS_URL=http://<%= spec.ip %>:<%= p('jenkins.http_port') %>
+USERNAME=<%= p('jenkins.drain.username') %>
+TOKEN=<%= p('jenkins.drain.password') %>
 SLEEP_INTERVAL_IN_SECONDS=5
 TIMEOUT_IN_SECONDS=<%= p('jenkins.drain.timeout') %>
 CRUMB_PATH='/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)'
