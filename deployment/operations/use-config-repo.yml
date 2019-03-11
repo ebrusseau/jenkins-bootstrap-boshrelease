@@ -2,11 +2,7 @@
   path: /instance_groups/name=jenkins-master/jobs/name=jenkins-master/properties?/jenkins/config/repo
   value:
     enabled: true
-    url: ((repo_url))
-    branch: ((repo_branch))
-    path: ((repo_path))
-    ssh_key: ((repo_ssh.private_key))
-
-- type: replace
-  path: /variables/name=repo_ssh?/type
-  value: ssh
+    url: ((config_repo_url))
+    branch: ((config_repo_branch))
+    path: ((config_repo_path))
+    ssh_key: ((config_repo_ssh_key))
