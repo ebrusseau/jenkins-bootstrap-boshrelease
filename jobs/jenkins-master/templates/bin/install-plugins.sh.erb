@@ -1,7 +1,8 @@
-#!/bin/bash -eu
+#!/bin/bash
 
 # Resolve dependencies and download plugins given on the command line
 
+set -eu
 set -o pipefail
 
 PLUGINS_DIR=${REF:-/var/vcap/store/jenkins-master/plugins}
@@ -128,6 +129,8 @@ download() {
         fi
 
         resolveDependencies "${plugin}"
+    else
+      echo " * ${plugin} is already scheduled to be downloaded"
     fi
 }
 
@@ -188,6 +191,7 @@ resolveDependencies() {
     plugin="${1}"
     jpi="$(getArchiveFilename "${plugin}")"
 
+    echo "Resolving dependencies for plugin: ${plugin}"
     dependencies="$(unzip -p "${jpi}" META-INF/MANIFEST.MF | tr -d '\r' | tr '\n' '|' | sed -e 's#| ##g' | tr '|' '\n' | grep "^Plugin-Dependencies: " | sed -e 's#^Plugin-Dependencies: ##')"
 
     if [[ ! ${dependencies} ]]; then
