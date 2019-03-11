@@ -1,6 +1,6 @@
 #!/bin/bash
 
-bosh deploy -d jenkins ../../deployment/jenkins.yml \
+bosh deploy -n -d jenkins ../../deployment/jenkins.yml \
   -o ../../deployment/operations/use-config-repo.yml \
   -o ../../deployment/operations/set-initial-config.yml \
   -o ../../deployment/operations/install-plugins.yml \
