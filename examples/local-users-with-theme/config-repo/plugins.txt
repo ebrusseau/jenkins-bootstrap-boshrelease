@@ -1,2 +1,1 @@
-matrix-auth:latest
 simple-theme-plugin:latest
