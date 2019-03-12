@@ -87,6 +87,11 @@ else
   cp ${JOB_CONFIG}/plugins.txt ${FINAL_CONFIG}/plugins.txt
 fi
 
+if [[ -e ${CONFIG_REPO}/approvedSignatures.txt ]]; then
+  echo "  > Copying approvedSignatures.txt from Repo"
+  cp ${CONFIG_REPO}/approvedSignatures.txt ${FINAL_CONFIG}/approvedSignatures.txt
+fi
+
 if [[ -d ${JOB_CONFIG}/userContent ]]; then
   echo "  > Copying User Content from Job"
   mkdir -p ${FINAL_CONFIG}/userContent

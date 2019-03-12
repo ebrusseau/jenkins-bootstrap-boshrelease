@@ -33,6 +33,7 @@ templates:
   config/plugins.txt.erb: config/plugins.txt
   config/ssh/id_rsa.erb: config/ssh/id_rsa
   config/ssh/config: config/ssh/config
+  config/init.groovy.d/script-approval.groovy: config/init.groovy.d/script-approval.groovy
   data/properties.sh.erb: data/properties.sh
   helpers/ctl_setup.sh: helpers/ctl_setup.sh
   helpers/ctl_utils.sh: helpers/ctl_utils.sh

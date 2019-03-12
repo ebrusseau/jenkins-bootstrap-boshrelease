@@ -58,6 +58,26 @@ if [[ -d ${CONFIG_PATH}/init.groovy.d ]]; then
     cp ${CONFIG_PATH}/init.groovy.d/*.groovy /var/vcap/store/jenkins-master/init.groovy.d/
 fi
 
+# Remove any existing User Content
+if [[ -d /var/vcap/store/jenkins-master/userContent ]]; then
+  rm -rf /var/vcap/store/jenkins-master/userContent
+fi
+
+# Copy User Content
+if [[ -d ${CONFIG_PATH}/userContent ]]; then
+  echo "Copying user content..."
+  mkdir -p /var/vcap/store/jenkins-master/userContent
+  cp -R ${CONFIG_PATH}/userContent/* /var/vcap/store/jenkins-master/userContent
+fi
+
+# Handle Script Approvals File
+if [[ -f ${CONFIG_PATH}/approvedSignatures.txt ]]; then
+  echo "Copying script approvals file to Jenkins home directory..."
+  cp ${CONFIG_PATH}/approvedSignatures.txt /var/vcap/store/jenkins-master/approvedSignatures.txt
+elif [[ -e /var/vcap/store/jenkins-master/approvedSignatures.txt ]]; then
+  rm -f /var/vcap/store/jenkins-master/approvedSignatures.txt
+fi
+
 # Handle plugins
 mkdir -p /var/vcap/store/jenkins-master/plugins
 if [[ -f ${CONFIG_PATH}/plugins.txt ]]; then
@@ -78,17 +98,5 @@ done
 
 # Always disabled plugin list (e.g. unsupported in this deployment)
 touch /var/vcap/store/jenkins-master/plugins/windows-slaves.jpi.disabled
-
-# Remove any existing User Content
-if [[ -d /var/vcap/store/jenkins-master/userContent ]]; then
-  rm -rf /var/vcap/store/jenkins-master/userContent
-fi
-
-# Copy User Content
-if [[ -d ${CONFIG_PATH}/userContent ]]; then
-  echo "Copying UserContent..."
-  mkdir -p /var/vcap/store/jenkins-master/userContent
-  cp -R ${CONFIG_PATH}/userContent/* /var/vcap/store/jenkins-master/userContent
-fi
 
 chown vcap:vcap -R /var/vcap/store/jenkins-master
