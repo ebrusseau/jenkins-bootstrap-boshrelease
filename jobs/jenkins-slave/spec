@@ -8,7 +8,7 @@ packages:
 - swarm-client
 
 consumes:
-- name: jenkins_master
+- name: master
   type: jenkins
   optional: true
 
@@ -24,31 +24,27 @@ templates:
   helpers/ctl_utils.sh: helpers/ctl_utils.sh
 
 properties:
-  jenkins.gitconfig.name:
+  gitconfig.name:
     description: "Name used when commiting to a git repository"
     default: "Jenkins CI"
-  jenkins.gitconfig.email:
+  gitconfig.email:
     description: "Email used when commiting to a git repository"
     default: "jenkins@jenkinsci.local"
-  jenkins.slave.executors:
+  executors:
     description: "The number of executors for this slave"
     default: 2
-  jenkins.slave.labels:
+  labels:
     description: "Labels to attach to the slave"
     default: "build"
-  jenkins.slave.username:
+  username:
     description: "Username of the user to connect to the master server"
-  jenkins.slave.password:
+    default: ""
+  password:
     description: "Password of the user to connect to the master server"
-  jenkins.slave.mode:
+    default: ""
+  mode:
     description: "The mode to run the slave"
     default: "normal"
-  jenkins.slave.prefix:
+  name_prefix:
     description: "The prefix to use in the slave name"
     default: "build"
-  jenkins.drain.enabled:
-    description: "Enables drain feature (EXPERIMENTAL)"
-    default: false
-  jenkins.drain.timeout:
-    description: "Time to wait in seconds before drain cancels running builds"
-    default: 600

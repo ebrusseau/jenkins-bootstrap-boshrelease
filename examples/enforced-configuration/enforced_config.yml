@@ -1,14 +1,3 @@
+---
 jenkins:
   systemMessage: "This message was configured via ENFORCED config"
-credentials:
-  system:
-    domainCredentials:
-      - credentials:
-          - basicSSHUserPrivateKey:
-              scope: GLOBAL
-              id: enforced-ssh-credential
-              username: enforced-ssh-user
-              description: "SSH credential added via enforced config"
-              privateKeySource:
-                directEntry:
-                  privateKey: ((ssh_credential.private_key))

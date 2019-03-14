@@ -2,15 +2,16 @@ jenkins:
   authorizationStrategy:
     projectMatrix:
       grantedPermissions:
-      - "Agent/Build:agent"
-      - "Agent/Configure:agent"
-      - "Agent/Connect:agent"
-      - "Agent/Create:agent"
-      - "Agent/Delete:agent"
-      - "Agent/Disconnect:agent"
+      - "Agent/Build:slave"
+      - "Agent/Configure:slave"
+      - "Agent/Connect:slave"
+      - "Agent/Create:slave"
+      - "Agent/Delete:slave"
+      - "Agent/Disconnect:slave"
       - "Overall/Administer:admin"
-      - "Job/Discover:anonymous"
-      - "Overall/Read:anonymous"
+      - "Job/Discover:authenticated"
+      - "Overall/Read:authenticated"
+      - "Overall/Read:slave"
   disableRememberMe: true
 unclassified:
   simple-theme-plugin:

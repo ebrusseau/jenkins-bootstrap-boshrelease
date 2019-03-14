@@ -3,13 +3,10 @@
 set -e # exit immediately if a simple command exits with a non-zero status
 set -u # report the usage of uninitialized variables
 
-CONFIG_PATH=/var/vcap/jobs/jenkins-master/config
-REPO_ENABLED="<%= p('jenkins.config.repo.enabled') %>"
-
 source /var/vcap/jobs/jenkins-master/data/properties.sh
 mkdir -p /var/vcap/store/jenkins-master
 
-echo "Merging jenkins.config.initial with base Jenkins CasC file..."
+echo "Merging config.initial with base Jenkins CasC file..."
 /var/vcap/packages/spruce/bin/spruce merge \
   /var/vcap/jobs/jenkins-master/config/jenkins_config.yml \
   /var/vcap/jobs/jenkins-master/config/initial_config.yml \
@@ -22,17 +19,19 @@ cat /var/vcap/data/jenkins-master/jenkins_config.yml
 echo "------------------------------------------------------------"
 echo
 
-if [[ ${REPO_ENABLED} == "true" ]]; then
-  CONFIG_PATH=/var/vcap/data/jenkins-master/config
-  /var/vcap/jobs/jenkins-master/bin/process-configuration-repo
-fi
+<% if p('config.repository.enabled') %>
+CONFIG_PATH=/var/vcap/data/jenkins-master/config
+/var/vcap/jobs/jenkins-master/bin/process-configuration-repo
+<% else %>
+CONFIG_PATH=/var/vcap/jobs/jenkins-master/config
+<% end -%>
 
 if [[ -e /var/vcap/store/jenkins-master/config.xml ]]; then
   echo "Removing stale config.xml file..."
   rm -f /var/vcap/store/jenkins-master/config.xml
 fi
 
-echo "Merging jenkins.config.enforced with final Jenkins CasC file..."
+echo "Merging config.enforced with final Jenkins CasC file..."
 /var/vcap/packages/spruce/bin/spruce merge \
   /var/vcap/data/jenkins-master/jenkins_config.yml \
   /var/vcap/jobs/jenkins-master/config/enforced_config.yml \
@@ -44,7 +43,6 @@ echo "Final config:"
 cat /var/vcap/store/jenkins-master/jenkins_config.yml
 echo "------------------------------------------------------------"
 echo
-
 
 # Remove any existing groovy init scripts
 if [[ -d /var/vcap/store/jenkins-master/init.groovy.d ]]; then
@@ -89,11 +87,11 @@ fi
 # TODO: Should disable/or remove plugins that aren't specified in plugins.txt
 OLDIFS=$IFS
 IFS=$'\n'
-DISABLEDPLUGINS=(<%= p('jenkins.plugins.disable') %>)
+DISABLEPLUGINS=(<%= p('plugins.disable','') %>)
 IFS=$OLDIFS
-for (( i=0; i<${#DISABLEDPLUGINS[@]}; i++ )); do
-    echo "Disabling ${DISABLEDPLUGINS[$i]} plugin"
-    touch /var/vcap/store/jenkins-master/plugins/${DISABLEDPLUGINS[$i]}.jpi.disabled
+for (( i=0; i<${#DISABLEPLUGINS[@]}; i++ )); do
+    echo "Disabling ${DISABLEPLUGINS[$i]} plugin"
+    touch /var/vcap/store/jenkins-master/plugins/${DISABLEPLUGINS[$i]}.jpi.disabled
 done
 
 # Always disabled plugin list (e.g. unsupported in this deployment)

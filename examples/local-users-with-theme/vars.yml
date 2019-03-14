@@ -1,0 +1,3 @@
+slave_username: slave
+config_repo_url: https://github.com/ebrusseau/jenkins-bootstrap-boshrelease.git
+config_repo_path: examples/local-users-with-theme/config-repo

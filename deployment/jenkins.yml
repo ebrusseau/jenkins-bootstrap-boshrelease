@@ -6,6 +6,13 @@ instance_groups:
   jobs:
   - name: jenkins-master
     release: jenkins-bootstrap
+    properties:
+      config:
+        repository:
+          enabled: false
+      drain:
+        enabled: false
+      port: 8080
   networks:
   - name: default
   stemcell: default
@@ -17,11 +24,7 @@ instance_groups:
   jobs:
   - name: jenkins-slave
     release: jenkins-bootstrap
-    properties:
-      jenkins:
-        slave:
-          username: ((slave_username))
-          password: ((slave_password))
+    properties: {}
   - name: docker
     release: docker
     properties:

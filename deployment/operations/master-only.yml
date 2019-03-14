@@ -11,9 +11,9 @@
   path: /releases/name=docker
 
 - type: replace
-  path: /instance_groups/name=jenkins-master/jobs/name=jenkins-master/properties?/jenkins/master/mode
+  path: /instance_groups/name=jenkins-master/jobs/name=jenkins-master/properties/mode?
   value: "NORMAL"
 
 - type: replace
-  path: /instance_groups/name=jenkins-master/jobs/name=jenkins-master/properties?/jenkins/master/executors
+  path: /instance_groups/name=jenkins-master/jobs/name=jenkins-master/properties/executors?
   value: 2

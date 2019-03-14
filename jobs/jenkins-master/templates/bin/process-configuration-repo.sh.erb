@@ -3,9 +3,10 @@
 set -e # exit immediately if a simple command exits with a non-zero status
 set -u # report the usage of uninitialized variables
 
-REPO_URL=<%= p('jenkins.config.repo.url') %>
-REPO_BRANCH=<%= p('jenkins.config.repo.branch') %>
-REPO_PATH=<%= p('jenkins.config.repo.path' ) %>
+<% if p('config.repository.enabled') %>
+REPO_URL=<%= p('config.repository.url') %>
+REPO_BRANCH=<%= p('config.repository.branch') %>
+REPO_PATH=<%= p('config.repository.path' ) %>
 GIT_REPO=/var/vcap/data/jenkins-master/config-repo
 JOB_CONFIG=/var/vcap/jobs/jenkins-master/config
 FINAL_CONFIG=/var/vcap/data/jenkins-master/config
@@ -54,7 +55,7 @@ mkdir -p ${FINAL_CONFIG}
 if [[ -z $(echo ${REPO_URL} | grep "http") ]]; then
   echo "Configuring SSH for Jenkins config repo..."
   if [[ ! $(cat /var/vcap/jobs/jenkins-master/config/ssh/id_rsa) == -* ]]; then
-    echo "ERROR: Value of jenkins.config.repo.ssh_key does not appear to be a valid private SSH key"
+    echo "ERROR: Value of config.repository.ssh_key does not appear to be a valid private SSH key"
     exit 1
   fi
 
@@ -146,3 +147,4 @@ if [[ $USE_SSH -eq 1 ]]; then
     mv /root/.ssh_backup /root/.ssh
   fi
 fi
+<% end -%>

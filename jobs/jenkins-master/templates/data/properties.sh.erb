@@ -20,6 +20,6 @@ export JENKINS=/var/vcap/packages/jenkins/jenkins/jenkins.war
 export MEMORY_SETTINGS=""
 
 export JENKINS_HOME=/var/vcap/store/jenkins-master
-export JENKINS_ARGS="--httpPort=<%= p('jenkins.master.http_port') %> --sessionTimeout=1440"
+export JENKINS_ARGS="--httpPort=<%= p('port') %> --sessionTimeout=1440"
 
 export CASC_JENKINS_CONFIG=${JENKINS_HOME}/jenkins_config.yml

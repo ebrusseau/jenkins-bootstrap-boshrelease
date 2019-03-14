@@ -9,12 +9,14 @@ packages:
 - spruce
 
 provides:
-- name: jenkins_master
+- name: master
   type: jenkins
   properties:
-  - jenkins.drain.password
-  - jenkins.drain.username
-  - jenkins.master.http_port
+  - drain.enabled
+  - drain.password
+  - drain.username
+  - drain.timeout
+  - port
 
 templates:
   bin/backup.sh.erb: bin/bbr/backup
@@ -39,54 +41,43 @@ templates:
   helpers/ctl_utils.sh: helpers/ctl_utils.sh
 
 properties:
-  jenkins.master.http_port:
-    description: "HTTP port to listen on"
-    default: 8080
-  jenkins.master.labels:
-    description: "Labels to attach to the master"
-    default: ""
-  jenkins.master.mode:
-    description: "The mode to run the master"
-    default: "EXCLUSIVE"
-  jenkins.master.executors:
-    description: "The number of executors for the master"
-    default: 0
-  jenkins.config.enforced:
+  config.enforced:
     description: "Extra YAML elements that are merged into the running CASC file after the config repo is merged"
-    default: "--- {}"
-  jenkins.config.initial:
+  config.initial:
     description: "Extra YAML elements that are merged into the base CASC file before the config repo is merged"
-    default: "--- {}"
-  jenkins.config.repo.enabled:
+  config.repository.enabled:
     description: "Enables retrieving Jenkins configuration from a separate Git repository"
-    default: false
-  jenkins.config.repo.url:
+  config.repository.url:
     description: "The Git repository that contains Jenkins configuration"
-    default: ""
-  jenkins.config.repo.branch:
+  config.repository.branch:
     description: "The repository branch to checkout"
     default: "master"
-  jenkins.config.repo.path:
+  config.repository.path:
     description: "The path within the repository that contains the configuration"
-    default: ""
-  jenkins.config.repo.ssh_key:
+    default: "/"
+  config.repository.ssh_key:
     description: "The SSH private key to use when accessing the config repository"
-    default: ""
-  jenkins.drain.enabled:
+  drain.enabled:
     description: "Enables drain feature (EXPERIMENTAL)"
-    default: false
-  jenkins.drain.timeout:
+  drain.timeout:
     description: "Time to wait in seconds before drain cancels running builds"
     default: 600
-  jenkins.drain.username:
+  drain.username:
     description: "Name of the user used to drain builds (needs API access)"
-    default: "admin"
-  jenkins.drain.password:
+  drain.password:
     description: "Password for the user used to drain builds"
+  executors:
+    description: "The number of executors for the master"
+    default: 0
+  labels:
+    description: "Labels to attach to the master"
     default: ""
-  jenkins.plugins.disable:
+  mode:
+    description: "The mode to run the master"
+    default: "EXCLUSIVE"
+  plugins.disable:
     description: "List of installed plugins to be disabled"
-    default: ""
-  jenkins.plugins.install:
+  plugins.install:
     description: "List of plugins to be installed"
-    default: ""
+  port:
+    description: "The port Jenkins will listen on"

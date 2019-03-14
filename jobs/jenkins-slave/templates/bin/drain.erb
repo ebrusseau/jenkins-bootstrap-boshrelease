@@ -1,18 +1,19 @@
 #!/bin/bash
 
-if [ "<%= p('jenkins.drain.enabled') %>" = "false" ]; then echo 0; exit 0; fi
-
 set -eo pipefail
 
-<% if_link('jenkins_master') do |jenkins_master| %>
-JENKINS_URL=http://<%= link('jenkins_master').instances[0].address %>:<%= link('jenkins_master').p('jenkins.master.http_port') %>
-USERNAME=<%= link('jenkins_master').p('jenkins.drain.username') %>
-TOKEN='<%= link('jenkins_master').p('jenkins.drain.password') %>'
+<% if_link('master') do |master| %>
+<% if link('master').p('drain.enabled') != true %>
+echo 0
+<% else %>
+JENKINS_URL=http://<%= link('master').instances[0].address %>:<%= link('master').p('port') %>
+USERNAME=<%= link('master').p('drain.username') %>
+TOKEN='<%= link('master').p('drain.password') %>'
 JOB_NAME=jenkins-slave
 SLEEP_INTERVAL_IN_SECONDS=5
-TIMEOUT_IN_SECONDS=<%= p('jenkins.drain.timeout') %>
+TIMEOUT_IN_SECONDS=<%= link('master').p('drain.timeout') %>
 CRUMB_PATH='/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)'
-BUILDS_PATH="/api/xml?&tree=jobs[builds[*]]&xpath=/hudson/job/build[contains(.,%27<%= p('jenkins.slave.prefix') %>-<%= spec.id %>%27)%20and%20building=%22true%22]&wrapper=builds"
+BUILDS_PATH="/api/xml?&tree=jobs[builds[*]]&xpath=/hudson/job/build[contains(.,%27<%= p('name_prefix') %>-<%= spec.id %>%27)%20and%20building=%22true%22]&wrapper=builds"
 NODE_NAME_PATH="/computer/api/xml?xpath=/computerSet/computer[starts-with(displayName,%27build%27)]/displayName"
 
 CRUMB=$(curl --silent --user ${USERNAME}:${TOKEN} ${JENKINS_URL}${CRUMB_PATH})
@@ -81,7 +82,8 @@ echo "$(date -Ins): Draining ${pid} with BOSH_JOB_STATE: ${BOSH_JOB_STATE} and B
 CURL_GET_PREFIX="curl --globoff --silent --user ${USERNAME}:${TOKEN} --header ${CRUMB} ${JENKINS_URL}"
 
 toggle_node_offline "Shutdown+from+BOSH" $(extract_node_name)
-poll_builds
-<% end %>
 
+poll_builds
+<% end -%>
+<% end -%>
 exit 0

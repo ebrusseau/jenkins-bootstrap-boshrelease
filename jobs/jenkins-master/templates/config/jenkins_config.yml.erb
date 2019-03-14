@@ -5,9 +5,9 @@ jenkins:
   crumbIssuer:
     standard:
       excludeClientIPFromCrumb: false
-  labelString: "<%= p('jenkins.master.labels', '') %>"
-  mode: <%= p('jenkins.master.mode').upcase %>
-  numExecutors: <%= p('jenkins.master.executors') %>
+  labelString: "<%= p('labels', '') %>"
+  mode: <%= p('mode').upcase %>
+  numExecutors: <%= p('executors') %>
   remotingSecurity:
     enabled: true
   slaveAgentPort: 50000
@@ -20,7 +20,7 @@ security:
     enabled: false
 unclassified:
   location:
-    url: "http://<%= spec.ip %>:<%= p('jenkins.master.http_port') %>"
+    url: "http://<%= spec.ip %>:<%= p('port') %>"
 tool:
   git:
     installations:

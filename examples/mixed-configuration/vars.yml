@@ -1,0 +1,2 @@
+config_repo_url: https://github.com/ebrusseau/jenkins-bootstrap-boshrelease.git
+config_repo_path: examples/mixed-configuration/config-repo

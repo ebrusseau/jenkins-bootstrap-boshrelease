@@ -11,6 +11,7 @@ BLUE="\033[34m"
 YELLOW="\033[33m"
 NORMAL="\033[0m"
 BLOBS=()
+FAILURES=0
 
 usage() {
   echo "Usage: ${SCRIPT_NAME} [OPTIONS]" 1>&2
@@ -93,7 +94,7 @@ download_blob() {
   local blob_dir=$(dirname ${blob_name})
   local blob_file="${SCRIPT_DIR}/blobs/${blob_name}"
 
-  shift; shift
+  BLOBS+=(${blob_name})
   printf " > ${BLUE}${BOLD}%-40s${NORMAL}" "${blob_name}"
   if [[ -e ${blob_file} ]]; then
     echo -e "${YELLOW}Skipping; file exists${NORMAL}"
@@ -101,15 +102,16 @@ download_blob() {
     mkdir -p ${SCRIPT_DIR}/blobs/${blob_dir}
 
     trap "kill 0" EXIT
+    shift; shift
     wget "$@" -q -O ${blob_file} ${blob_url} &
     show_spinner "$!"
     wait %1
     if [[ $? -eq 0 ]]; then
       echo -e "${GREEN}Done${NORMAL}"
-      BLOBS+=(${blob_name})
     else
+      [[ -e ${blob_file} ]] && rm -f ${blob_file}
       echo -e "${RED}FAILED${NORMAL}"
-      fail "Could not download ${blob_url}"
+      FAILURES=$((FAILURES+1))
     fi
   fi
 }
@@ -120,8 +122,10 @@ add_blob() {
 
   if [[ -e ${blob_file} ]]; then
     bosh add-blob ${blob_file} ${blob_name}
+    return $?
   else
-    fail "File missing for blob: ${blob_name}"
+    FAILURE+=("File missing for blob: ${blob_name}")
+    return 1
   fi
 }
 
@@ -169,9 +173,23 @@ main() {
   download_blob spruce/spruce-binary $(get_github_release_url geofffranks spruce)
 
   if [ ${#BLOBS} -ne 0 ]; then
-    for blob in ${BLOBS[@]}; do
-      add_blob ${blob}
+    echo
+    echo "Adding blobs to BOSH release: "
+    for blob_name in ${BLOBS[@]}; do
+      printf " > ${BLUE}${BOLD}%-40s${NORMAL}" "${blob_name}"
+      add_blob ${blob_name} > /dev/null 2>&1
+      if [[ $? -eq 0 ]]; then
+        echo -e "${GREEN}Success${NORMAL}"
+      else
+        echo -e "${RED}FAILED${NORMAL}"
+        FAILURES=$((FAILURES+1))
+      fi
     done
+  fi
+
+  if [ ${FAILURES} -gt 0 ]; then
+    echo
+    fail "One or more failures occured"
   fi
 }
 

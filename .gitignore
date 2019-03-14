@@ -13,3 +13,6 @@ releases/**/*.tgz
 *#
 #*
 tmp
+creds.yml
+jenkins-bootstrap-dev.tgz
+jenkins-bootstrap-final.tgz

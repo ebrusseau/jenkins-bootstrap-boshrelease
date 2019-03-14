@@ -1,0 +1,3 @@
+- type: replace
+  path: /instance_groups/name=jenkins-slave/jobs/name=jenkins-slave/properties/labels?
+  value: ((slave_labels))

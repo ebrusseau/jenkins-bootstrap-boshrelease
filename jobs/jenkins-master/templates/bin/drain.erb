@@ -2,13 +2,14 @@
 
 set -eo pipefail
 
-if [ "<%= p('jenkins.drain.enabled') %>" = "false" ]; then echo 0; exit 0; fi
-
-JENKINS_URL=http://<%= spec.ip %>:<%= p('jenkins.master.http_port') %>
-USERNAME=<%= p('jenkins.drain.username') %>
-TOKEN=<%= p('jenkins.drain.password') %>
+<% if p('drain.enabled') != true %>
+echo 0
+<% else %>
+JENKINS_URL=http://<%= spec.ip %>:<%= p('port') %>
+USERNAME=<%= p('drain.username') %>
+TOKEN=<%= p('drain.password') %>
 SLEEP_INTERVAL_IN_SECONDS=5
-TIMEOUT_IN_SECONDS=<%= p('jenkins.drain.timeout') %>
+TIMEOUT_IN_SECONDS=<%= p('drain.timeout') %>
 CRUMB_PATH='/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)'
 BUILDS_PATH="/api/xml?&tree=jobs[builds[*]]&xpath=/hudson/job/build[building=%22true%22]&wrapper=builds"
 
@@ -73,5 +74,5 @@ CURL_PREFIX="curl --globoff --silent --user ${USERNAME}:${TOKEN} --header ${CRUM
 ${CURL_PREFIX}/quietDown --request POST
 
 poll_builds
-
+<% end -%>
 exit 0

@@ -1,9 +1,12 @@
 #!/bin/bash
+flags=$*
+branch=${GIT_BRANCH:-master}
 
-bosh deploy -n -d jenkins ../../deployment/jenkins.yml \
-  -o ../../deployment/operations/use-config-repo.yml \
-  -o ../../deployment/operations/master-only.yml \
-  -v deployment_name=jenkins \
-  -v config_repo_url=https://github.com/ebrusseau/jenkins-bootstrap-boshrelease.git \
-  -v config_repo_branch=testing \
-  -v config_repo_path=examples/script-approval/config-repo
+bosh deploy ${flags} --deployment jenkins ../../deployment/jenkins.yml \
+  --ops-file ../../deployment/operations/enable-config-repository.yml \
+  --ops-file ../../deployment/operations/set-config-repository-branch.yml \
+  --ops-file ../../deployment/operations/set-config-repository-path.yml \
+  --ops-file ../../deployment/operations/master-only.yml \
+  --vars-file ${PWD}/vars.yml \
+  --var deployment_name=jenkins \
+  --var config_repo_branch=${branch}
