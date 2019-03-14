@@ -1,10 +1,6 @@
-credentials:
-  system:
-    domainCredentials:
-      - credentials:
-          - usernamePassword:
-              scope: GLOBAL
-              id: "credentials-from-manifest"
-              username: "some-user"
-              password: "some-password"
-              description: "Username/Password Credentials added via manifest"
+jenkins:
+  globalNodeProperties:
+    - envVars:
+        env:
+        - key: "VarFromManifest"
+          value: "some-value"

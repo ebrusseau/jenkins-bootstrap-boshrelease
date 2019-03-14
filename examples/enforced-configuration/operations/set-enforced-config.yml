@@ -1,0 +1,3 @@
+---
+jenkins:
+  systemMessage: "This message was configured via ENFORCED config"

@@ -1,12 +1,8 @@
-credentials:
-  system:
-    domainCredentials:
-      - credentials:
-          - (( append ))
-          # Note the append above, so as to not overwrite anything from manifest
-          - usernamePassword:
-              scope: GLOBAL
-              id: "credentials-from-config-repo"
-              username: "some-user"
-              password: "some-password"
-              description: "Username/Password Credentials added via config repository"
+jenkins:
+  globalNodeProperties:
+    - envVars:
+        env:
+        - (( append ))
+        # Note the append above, so as to not overwrite anything from manifest
+        - key: "VarFromRepo"
+          value: "some-value"

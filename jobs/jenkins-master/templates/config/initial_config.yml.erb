@@ -1,1 +1,5 @@
-<%= p('config.initial','--- {}') %>
+<% if p('config.initial').is_a?(Hash) %>
+<%= p('config.initial').to_yaml %>
+<% else %>
+<%= p('config.initial') %>
+<% end -%>

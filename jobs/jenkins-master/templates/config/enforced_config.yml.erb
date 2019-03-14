@@ -1,1 +1,5 @@
-<%= p('config.enforced','--- {}') %>
+<% if p('config.enforced').is_a?(Hash) %>
+<%= p('config.enforced').to_yaml %>
+<% else %>
+<%= p('config.enforced') %>
+<% end -%>

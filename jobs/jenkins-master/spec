@@ -43,8 +43,10 @@ templates:
 properties:
   config.enforced:
     description: "Extra YAML elements that are merged into the running CASC file after the config repo is merged"
+    default: "--- {}"
   config.initial:
     description: "Extra YAML elements that are merged into the base CASC file before the config repo is merged"
+    default: "--- {}"
   config.repository.enabled:
     description: "Enables retrieving Jenkins configuration from a separate Git repository"
   config.repository.url:

@@ -1,0 +1,13 @@
+- type: replace
+  path: /instance_groups/name=jenkins-master/jobs/name=jenkins-master/properties/config/enforced?
+  value:
+    jenkins:
+      securityRealm:
+        local:
+          allowsSignup: false
+          enableCaptcha: false
+          users:
+            - id: ((admin_username))
+              password: ((admin_password))
+            - id: ((slave_username))
+              password: ((slave_password))
