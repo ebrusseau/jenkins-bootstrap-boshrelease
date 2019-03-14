@@ -1,0 +1,20 @@
+jobs:
+  - script: >
+       pipelineJob('long-running-job') {
+         definition {
+           cps {
+             script("""\
+               pipeline {
+                 agent any
+                 stages {
+                   stage ('test') {
+                     steps {
+                       echo "Sleeping for 2 minutes..."
+                       sh "sleep 120"
+                     }
+                   }
+                 }
+               }""".stripIndent())
+           }
+         }
+       }

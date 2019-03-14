@@ -2,23 +2,3 @@
 - type: replace
   path: /instance_groups/name=jenkins-master/jobs/name=jenkins-master/properties/drain/enabled
   value: true
-
-- type: replace
-  path: /instance_groups/name=jenkins-slave/jobs/name=jenkins-slave/properties/drain/enabled
-  value: true
-
-- type: replace
-  path: /instance_groups/name=jenkins-slave/jobs/name=jenkins-master/properties/drain/username?
-  value: ((drain_username))
-
-- type: replace
-  path: /instance_groups/name=jenkins-slave/jobs/name=jenkins-master/properties/drain/password?
-  value: ((drain_password))
-
-- type: replace
-  path: /instance_groups/name=jenkins-slave/jobs/name=jenkins-slave/properties/drain/username?
-  value: ((drain_username))
-
-- type: replace
-  path: /instance_groups/name=jenkins-slave/jobs/name=jenkins-slave/properties/drain/password?
-  value: ((drain_password))

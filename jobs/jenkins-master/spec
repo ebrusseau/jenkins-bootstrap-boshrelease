@@ -66,8 +66,10 @@ properties:
     default: 600
   drain.username:
     description: "Name of the user used to drain builds (needs API access)"
+    default: ""
   drain.password:
     description: "Password for the user used to drain builds"
+    default: ""
   executors:
     description: "The number of executors for the master"
     default: 0

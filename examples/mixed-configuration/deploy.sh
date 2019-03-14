@@ -1,5 +1,5 @@
 #!/bin/bash
-flags="$@"
+flags=$*
 branch=${GIT_BRANCH:-master}
 
 bosh deploy ${flags} --deployment jenkins ../../deployment/jenkins.yml \

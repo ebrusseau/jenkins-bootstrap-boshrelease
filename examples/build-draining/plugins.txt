@@ -1,0 +1,5 @@
+workflow-aggregator:latest
+workflow-job:latest
+workflow-cps:latest
+job-dsl:latest
+view-job-filters:latest

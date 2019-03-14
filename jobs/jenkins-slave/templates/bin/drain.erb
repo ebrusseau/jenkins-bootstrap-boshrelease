@@ -3,20 +3,19 @@
 set -eo pipefail
 
 <% if_link('master') do |master| %>
-<% if link('master').p('drain.enabled') != true %>
-echo 0
-<% else %>
+<% if link('master').p('drain.enabled') == true %>
 JENKINS_URL=http://<%= link('master').instances[0].address %>:<%= link('master').p('port') %>
-USERNAME=<%= link('master').p('drain.username') %>
-TOKEN='<%= link('master').p('drain.password') %>'
 JOB_NAME=jenkins-slave
 SLEEP_INTERVAL_IN_SECONDS=5
 TIMEOUT_IN_SECONDS=<%= link('master').p('drain.timeout') %>
 CRUMB_PATH='/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)'
 BUILDS_PATH="/api/xml?&tree=jobs[builds[*]]&xpath=/hudson/job/build[contains(.,%27<%= p('name_prefix') %>-<%= spec.id %>%27)%20and%20building=%22true%22]&wrapper=builds"
 NODE_NAME_PATH="/computer/api/xml?xpath=/computerSet/computer[starts-with(displayName,%27build%27)]/displayName"
+<% if link('master').p('drain.username') != "" && link('master').p('drain.password') !="" %>
+AUTH="--user <%= link('master').p('drain.username') %>:<%= link('master').p('drain.password') %>"
+<% end -%>
 
-CRUMB=$(curl --silent --user ${USERNAME}:${TOKEN} ${JENKINS_URL}${CRUMB_PATH})
+CRUMB=$(curl --silent ${AUTH} ${JENKINS_URL}${CRUMB_PATH})
 
 . /var/vcap/jobs/jenkins-slave/bin/common-functions
 
@@ -41,12 +40,12 @@ output_for_bosh() {
 poll_builds() {
   local _builds=$(check_builds)
 
-  while [ "${_builds}" != "<builds/>" ]; do
+  while [[ "${_builds}" != "<builds/>" ]]; do
     sleep ${SLEEP_INTERVAL_IN_SECONDS}
     set +e
     let TIMEOUT_IN_SECONDS=TIMEOUT_IN_SECONDS-SLEEP_INTERVAL_IN_SECONDS
     set -e
-    if [ ${TIMEOUT_IN_SECONDS} -le 0 ]; then
+    if [[ ${TIMEOUT_IN_SECONDS} -le 0 ]]; then
       echo "$(date -Ins): Timed out waiting for builds to complete"
       exit 0
     fi
@@ -70,7 +69,7 @@ trap output_for_bosh EXIT
 # Check whether the process is running.
 pid_path=/var/vcap/sys/run/${JOB_NAME}/${JOB_NAME}.pid
 
-if [ ! -f "${pid_path}" ]; then echo 0; exit 0; fi
+if [[ ! -f "${pid_path}" ]]; then echo 0; exit 0; fi
 
 pid=$(<"$pid_path")
 
@@ -79,11 +78,13 @@ if ! ps -p "${pid}" >/dev/null; then echo 0; exit 0; fi
 # Process is running, so send signal to instruct the Jenkins Master to wait for jobs running on this slave to complete, then toggle the slave offline.
 echo "$(date -Ins): Draining ${pid} with BOSH_JOB_STATE: ${BOSH_JOB_STATE} and BOSH_JOB_NEXT_STATE: ${BOSH_JOB_NEXT_STATE}"
 
-CURL_GET_PREFIX="curl --globoff --silent --user ${USERNAME}:${TOKEN} --header ${CRUMB} ${JENKINS_URL}"
+CURL_GET_PREFIX="curl --globoff --silent ${AUTH} --header ${CRUMB} ${JENKINS_URL}"
 
 toggle_node_offline "Shutdown+from+BOSH" $(extract_node_name)
 
 poll_builds
+<% else %>
+echo 0
 <% end -%>
 <% end -%>
 exit 0
