@@ -72,7 +72,7 @@ get_github_archive_url() {
     fail "GitHub owner and repo must be supplied"
   fi
 
-  tag=$(git ls-remote --tags --sort="v:refname" https://github.com/${owner}/${repo} | tail -n1 | sed 's/.*\///; s/\^{}//')
+  tag=$(git ls-remote --tags https://github.com/${owner}/${repo} | sort -Vk2 | tail -n1 | sed 's/.*\///; s/\^{}//')
   echo "https://github.com/${owner}/${repo}/archive/${tag}.tar.gz"
 }
 
