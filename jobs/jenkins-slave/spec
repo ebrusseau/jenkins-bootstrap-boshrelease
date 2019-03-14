@@ -3,12 +3,9 @@ name: jenkins-slave
 
 packages:
 - oracle-jdk
-- swarm-client
-- apache-maven
 - git-client
 - cf-cli
-- golang
-- apache-groovy
+- swarm-client
 
 consumes:
 - name: jenkins_master

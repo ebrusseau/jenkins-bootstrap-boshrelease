@@ -1,8 +1,0 @@
----
-name: apache-maven
-
-dependencies:
-- oracle-jdk
-
-files:
-- apache-maven/apache-maven-binary.tar.gz

@@ -1,9 +1,0 @@
----
-name: apache-groovy
-
-dependencies:
-- oracle-jdk
-
-files:
-- apache-groovy/apache-groovy-binary.zip
-- apache-groovy/snakeyaml.jar
