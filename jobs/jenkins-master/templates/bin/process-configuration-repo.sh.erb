@@ -7,10 +7,33 @@ REPO_URL=<%= p('jenkins.config.repo.url') %>
 REPO_BRANCH=<%= p('jenkins.config.repo.branch') %>
 REPO_PATH=<%= p('jenkins.config.repo.path' ) %>
 GIT_REPO=/var/vcap/data/jenkins-master/config-repo
-CONFIG_REPO=${GIT_REPO}
 JOB_CONFIG=/var/vcap/jobs/jenkins-master/config
 FINAL_CONFIG=/var/vcap/data/jenkins-master/config
 USE_SSH=0
+
+normalizePath() {
+  local input=$1
+  local length=${#input}
+  local first_char=${input:0:1}
+  local result
+
+  if [[ $first_char == "/" ]]; then
+    result=${input}
+  elif [[ $first_char == "." ]]; then
+    result=$(normalizePath ${input:1:length})
+  else
+    result="/${input}"
+  fi
+
+  length=${#result}
+  local last_char=${result:length-1:1}
+
+  if [[ $last_char == "/" ]]; then
+    result=${result:0:length-1}
+  fi
+
+  echo "$result"
+}
 
 if [[ -z "${REPO_URL}" ]]; then
   echo "ERROR: Config repo URL not specified"
@@ -50,13 +73,11 @@ echo "Cloning (shallow) configuration repository at ${REPO_URL} using branch ${R
 mkdir -p ${GIT_REPO}
 /var/vcap/packages/git-client/bin/git clone -b ${REPO_BRANCH} --depth 1 ${REPO_URL} ${GIT_REPO}
 
-# Normalize and appent repo path
+# Normalize repo path if any
 if [[ -n ${REPO_PATH} ]]; then
-  if [[ ${REPO_PATH:0:1} != "/" ]]; then
-    REPO_PATH=/${REPO_PATH}
-  fi
-  echo "Will look for configuration files in path ${REPO_PATH} of repository..."
-  CONFIG_REPO="${CONFIG_REPO}${REPO_PATH}"
+  CONFIG_REPO="${GIT_REPO}$(normalizePath ${REPO_PATH})"
+else
+  CONFIG_REPO=${GIT_REPO}
 fi
 
 echo "Using configuration from ${CONFIG_REPO}..."

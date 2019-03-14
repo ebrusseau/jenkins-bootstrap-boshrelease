@@ -288,7 +288,7 @@ main() {
             plugin=$(echo "${line}" | tr -d '\r' | sed -e 's/^[ \t]*//g' -e 's/[ \t]*$//g' -e 's/[ \t]*#.*$//g' -e '/^[ \t]*$/d')
 
             # Avoid adding empty plugin into array
-            if [ ${#plugin} -ne 0 ]; then
+            if [[ ${#plugin} -ne 0 ]]; then
                 plugins+=("${plugin}")
             fi
         done
@@ -322,6 +322,7 @@ main() {
 
     # Check if there's a version-specific update center, which is the case for LTS versions
     jenkinsVersion="$(jenkinsMajorMinorVersion)"
+    echo "Jenkins version: ${jenkinsVersion}"
     if curl -fsL -o /dev/null "${JENKINS_UC}/${jenkinsVersion}"; then
         JENKINS_UC_LATEST="${JENKINS_UC}/${jenkinsVersion}"
         echo "Using version-specific update center: ${JENKINS_UC_LATEST}..."
