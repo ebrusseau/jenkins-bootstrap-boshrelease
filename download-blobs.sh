@@ -82,8 +82,8 @@ get_plugin_url() {
 
   baseurl="https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/${plugin}"
   version=$(curl -s ${baseurl}/maven-metadata.xml \
-  | grep latest \
-  | sed 's/^[\ ]*\<latest\>//; s/\<\/latest\>//')
+  | grep -o '<latest>.*</latest>' \
+  | sed 's/<latest>\(.*\)<\/latest>/\1/g')
   echo "${baseurl}/${version}/${plugin}-${version}.jar"
 }
 
