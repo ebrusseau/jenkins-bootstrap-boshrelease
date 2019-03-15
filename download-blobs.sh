@@ -29,24 +29,6 @@ fail() {
   exit 1
 }
 
-show_spinner() {
-  local -r pid="${1}"
-  local -r delay='0.1'
-  local spinstr='\|/-'
-  local temp
-
-  printf "Downloading "
-  while kill -0 $pid 2>/dev/null; do
-    temp="${spinstr#?}"
-    printf "[%c]" "${spinstr}"
-    spinstr=${temp}${spinstr%"${temp}"}
-    sleep "${delay}"
-    printf "\b\b\b"
-  done
-
-  printf "\b\b\b\b\b\b\b\b\b\b\b\b               \b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
-}
-
 get_github_release_url() {
   local owner=${1}
   local repo=${2}
@@ -100,12 +82,7 @@ download_blob() {
     echo -e "${YELLOW}Skipping; file exists${NORMAL}"
   else
     mkdir -p ${SCRIPT_DIR}/blobs/${blob_dir}
-
-    trap "kill 0" EXIT
-    shift; shift
-    wget "$@" -q -O ${blob_file} ${blob_url} &
-    show_spinner "$!"
-    wait %1
+    wget "$@" -q -O ${blob_file} ${blob_url}
     if [[ $? -eq 0 ]]; then
       echo -e "${GREEN}Done${NORMAL}"
     else
