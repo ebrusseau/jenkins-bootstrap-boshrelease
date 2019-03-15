@@ -34,7 +34,7 @@ main() {
       version_suffix="-dev.$(date '+%Y%m%d.%-H%M.%S+%Z')"
       ;;
     final)
-      create_args="--final"
+      create_args="--force --final"
       ;;
     -h|--help)
       usage
