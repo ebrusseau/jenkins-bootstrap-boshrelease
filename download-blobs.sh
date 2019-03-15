@@ -75,8 +75,9 @@ download_blob() {
   local blob_url=${2}
   local blob_dir=$(dirname ${blob_name})
   local blob_file="${SCRIPT_DIR}/blobs/${blob_name}"
+  shift; shift
 
-  BLOBS+=(${blob_name})
+  BLOBS+=("${blob_name}")
   printf " > ${BLUE}${BOLD}%-40s${NORMAL}" "${blob_name}"
   if [[ -e ${blob_file} ]]; then
     echo -e "${YELLOW}Skipping; file exists${NORMAL}"
