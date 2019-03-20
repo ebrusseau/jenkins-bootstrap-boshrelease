@@ -37,9 +37,9 @@ main() {
   case ${1} in
     dev)
       version_suffix="-dev.$(date '+%Y%m%d.%-H%M.%S+%Z')"
+      create_args="--force"
       ;;
     final)
-      version_suffix="-$(date '+%Y%m%d.%-H%M.%S+%Z')"
       create_args="--final"
       ;;
     -h|--help)
@@ -54,7 +54,7 @@ main() {
 
   version="$(get_jenkins_version)${version_suffix}"
   filename=${2:-jenkins-bootstrap-${1}.tgz}
-  create_args="${create_args} --force --version=${version} --tarball=${filename}"
+  create_args="${create_args} --version=${version} --tarball=${filename}"
 
   echo "Creating BOSH release with version: ${version}"
   bosh create-release ${create_args}
