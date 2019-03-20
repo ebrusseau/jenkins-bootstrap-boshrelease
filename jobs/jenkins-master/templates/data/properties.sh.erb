@@ -1,3 +1,10 @@
+<%=
+port = p("port")
+
+if port < 1024
+  raise "Ports lower than 1024 are not allowed"
+end
+%>
 #!/usr/bin/env bash
 
 # job template binding variables

@@ -5,16 +5,14 @@ jenkins:
   crumbIssuer:
     standard:
       excludeClientIPFromCrumb: false
-  labelString: "<%= p('labels', '') %>"
+<% if_p('labels') do |labels| %>
+  labelString: "<%= labels %>"
+<% end %>
   mode: <%= p('mode').upcase %>
   numExecutors: <%= p('executors') %>
   remotingSecurity:
     enabled: true
   slaveAgentPort: 50000
-plugins:
-  sites:
-  - id: "default"
-    url: "https://updates.jenkins.io/update-center.json"
 security:
   remotingCLI:
     enabled: false

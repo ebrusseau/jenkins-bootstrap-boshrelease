@@ -75,7 +75,6 @@ properties:
     default: 0
   labels:
     description: "Labels to attach to the master"
-    default: ""
   mode:
     description: "The mode to run the master"
     default: "EXCLUSIVE"
@@ -85,3 +84,4 @@ properties:
     description: "List of plugins to be installed"
   port:
     description: "The port Jenkins will listen on"
+    default: 8080

@@ -12,7 +12,6 @@ instance_groups:
           enabled: false
       drain:
         enabled: false
-      port: 8080
   networks:
   - name: default
   stemcell: default
