@@ -19,6 +19,12 @@ get_jenkins_version() {
   fi
 
   version=$(unzip -p "${war}" META-INF/MANIFEST.MF | grep "^Jenkins-Version: " | sed -e 's#^Jenkins-Version: ##')
+
+  if [[ $? -ne 0 ]]; then
+    echo "Jenkins blob file damaged; use 'download-blobs -c' to re-download"
+    exit 1
+  fi
+
   version=${version%%[[:space:]]}
   echo "${version}"
 }
@@ -30,11 +36,11 @@ main() {
 
   case ${1} in
     dev)
-      create_args="--force"
       version_suffix="-dev.$(date '+%Y%m%d.%-H%M.%S+%Z')"
       ;;
     final)
-      create_args="--force --final"
+      version_suffix="-$(date '+%Y%m%d.%-H%M.%S+%Z')"
+      create_args="--final"
       ;;
     -h|--help)
       usage
@@ -45,9 +51,10 @@ main() {
       ;;
   esac
 
+
   version="$(get_jenkins_version)${version_suffix}"
   filename=${2:-jenkins-bootstrap-${1}.tgz}
-  create_args="${create_args} --version=${version} --tarball=${filename}"
+  create_args="${create_args} --force --version=${version} --tarball=${filename}"
 
   echo "Creating BOSH release with version: ${version}"
   bosh create-release ${create_args}
