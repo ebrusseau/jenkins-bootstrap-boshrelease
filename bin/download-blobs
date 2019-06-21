@@ -1,9 +1,10 @@
-#!/bin/bash
+${REPO_DIR}#!/bin/bash
 
 set -o pipefail
 
-SCRIPT_DIR=$(dirname $0)
 SCRIPT_NAME=$(basename $0)
+REPO_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+BLOBS_DIR="${REPO_DIR}/blobs"
 BOLD="\033[1m"
 RED="\033[31m"
 GREEN="\033[32m"
@@ -17,9 +18,12 @@ usage() {
   echo "Usage: ${SCRIPT_NAME} [OPTIONS]" 1>&2
   echo "  Available Options:"
   echo "    -c, --clean         Cleans out existing blob files and re-downloads them"
-  echo "    -v, --version       Download a specific Jenkins LTS version (\"latest\" will be used by default)"
+  echo "    -v, --version       Download a specific Jenkins LTS version"
+  echo "                        (Defaults to \"latest\" if not specified)"
+  echo "    -o, --output        Directory to place blobs"
+  echo "                        (Defaults to \"${REPO_DIR}/blobs\" if not specified)"
   echo
-  echo "  Example usage: ${SCRIPT_NAME} --clean --version 2.150.1"
+  echo "  Example usage: ${SCRIPT_NAME} --clean --version 2.150.1 --output /home/me/my-release/blobs"
   echo
   exit 1
 }
@@ -74,7 +78,7 @@ download_blob() {
   local blob_name=${1}
   local blob_url=${2}
   local blob_dir=$(dirname ${blob_name})
-  local blob_file="${SCRIPT_DIR}/blobs/${blob_name}"
+  local blob_file="${BLOBS_DIR}/${blob_name}"
   shift; shift
 
   BLOBS+=("${blob_name}")
@@ -82,7 +86,7 @@ download_blob() {
   if [[ -e ${blob_file} ]]; then
     echo -e "${YELLOW}Skipping; file exists${NORMAL}"
   else
-    mkdir -p ${SCRIPT_DIR}/blobs/${blob_dir}
+    mkdir -p ${BLOBS_DIR}/${blob_dir}
     wget "$@" -q -O ${blob_file} ${blob_url}
     if [[ $? -eq 0 ]]; then
       echo -e "${GREEN}Done${NORMAL}"
@@ -96,7 +100,7 @@ download_blob() {
 
 add_blob() {
   local blob_name=${1}
-  local blob_file=${SCRIPT_DIR}/blobs/${blob_name}
+  local blob_file=${BLOBS_DIR}/${blob_name}
 
   if [[ -e ${blob_file} ]]; then
     bosh add-blob ${blob_file} ${blob_name}
@@ -109,21 +113,25 @@ add_blob() {
 
 clean_blobs() {
   echo "Cleaning out existing blobs..."
-  [[ -d ${SCRIPT_DIR}/blobs ]] && rm -rf ${SCRIPT_DIR}/blobs
-  echo "--- {}" > ${SCRIPT_DIR}/config/blobs.yml
+  [[ -d ${BLOBS_DIR} ]] && rm -rf ${BLOBS_DIR}
+  echo "--- {}" > ${REPO_DIR}/config/blobs.yml
 }
 
 main() {
   local jenkins_version="latest"
 
   while [[ $# -gt 0 ]]; do
-    case "$1" in
+    case "${1}" in
       -c|--clean)
         clean_blobs
         ;;
       -v|--version)
         shift
         jenkins_version="${1}"
+        ;;
+      -o|--output)
+        shift
+        BLOBS_DIR="${1}"
         ;;
       -h|--help)
         usage
@@ -139,6 +147,7 @@ main() {
     shift
   done
 
+  echo
   echo "Downloading Jenkins package blob (${jenkins_version}):"
   download_blob jenkins/jenkins.war "http://mirrors.jenkins.io/war-stable/${jenkins_version}/jenkins.war"
 

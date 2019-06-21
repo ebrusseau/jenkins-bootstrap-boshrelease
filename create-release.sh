@@ -14,14 +14,18 @@ get_jenkins_version() {
   local war=blobs/jenkins/jenkins.war
   local version
   if [[ ! -e ${war} ]]; then
-    echo "Jenkins blob file missing; use 'download-blobs' to download"
+    echo
+    echo "ERROR: Jenkins blob file missing; use 'download-blobs' to download"
+    echo
     exit 1
   fi
 
   version=$(unzip -p "${war}" META-INF/MANIFEST.MF | grep "^Jenkins-Version: " | sed -e 's#^Jenkins-Version: ##')
 
   if [[ $? -ne 0 ]]; then
-    echo "Jenkins blob file damaged; use 'download-blobs -c' to re-download"
+    echo
+    echo "ERROR: Jenkins blob file damaged; use 'download-blobs -c' to re-download"
+    echo
     exit 1
   fi
 
@@ -31,7 +35,8 @@ get_jenkins_version() {
 
 main() {
   if [[ $# -lt 1 ]]; then
-    usage "missing arguments"
+    echo "ERROR: Missing arguments"
+    usage
   fi
 
   case ${1} in
@@ -46,7 +51,7 @@ main() {
       usage
       ;;
     *)
-      echo "ERROR: Invalid release type: ${1}"
+      echo "ERROR: Invalid option: ${1}"
       usage
       ;;
   esac
