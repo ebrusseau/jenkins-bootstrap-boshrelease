@@ -1,0 +1,111 @@
+jenkins:
+  primaryView:
+    all:
+      name: "all"
+  views:
+    - list:
+        name: "Failed Jobs"
+        jobFilters:
+        - jobStatusFilter:
+            aborted: false
+            disabled: false
+            failed: true
+            includeExcludeTypeString: "includeMatched"
+            stable: false
+            unstable: false
+    - list:
+        name: "Specific Jobs"
+        includeRegex: "(first|third)-job"
+jobs:
+  - script: >
+       pipelineJob('first-job') {
+         definition {
+           cps {
+             script("""\
+               pipeline {
+                 agent any
+                 stages {
+                   stage ('test') {
+                     steps {
+                       echo "hello"
+                     }
+                   }
+                 }
+               }""".stripIndent())
+           }
+         }
+       }
+  - script: >
+       pipelineJob('second-job') {
+         definition {
+           cps {
+             script("""\
+               pipeline {
+                 agent any
+                 stages {
+                   stage ('test') {
+                     steps {
+                       echo "FAIL"
+                       exit 1
+                     }
+                   }
+                 }
+               }""".stripIndent())
+           }
+         }
+       }
+  - script: >
+       pipelineJob('second-job') {
+         definition {
+           cps {
+             script("""\
+               pipeline {
+                 agent any
+                 stages {
+                   stage ('test') {
+                     steps {
+                       echo "hello"
+                     }
+                   }
+                 }
+               }""".stripIndent())
+           }
+         }
+       }
+  - script: >
+       pipelineJob('third-job') {
+         definition {
+           cps {
+             script("""\
+               pipeline {
+                 agent any
+                 stages {
+                   stage ('test') {
+                     steps {
+                       echo "hello"
+                     }
+                   }
+                 }
+               }""".stripIndent())
+           }
+         }
+       }
+  - script: >
+       pipelineJob('fourth-job') {
+         definition {
+           cps {
+             script("""\
+               pipeline {
+                 agent any
+                 stages {
+                   stage ('test') {
+                     steps {
+                       echo "FAIL!"
+                       exit 1
+                     }
+                   }
+                 }
+               }""".stripIndent())
+           }
+         }
+       }
