@@ -2,7 +2,7 @@
 name: jenkins
 
 dependencies:
-- oracle-jdk
+- openjdk-8
 
 files:
 - jenkins/jenkins.war

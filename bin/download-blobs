@@ -1,9 +1,9 @@
-${REPO_DIR}#!/bin/bash
+#!/bin/bash
 
 set -o pipefail
 
-SCRIPT_NAME=$(basename $0)
-REPO_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+SCRIPT_NAME=$(basename "$0")
+REPO_DIR=$( cd "$( dirname "$0" )/.." && pwd )
 BLOBS_DIR="${REPO_DIR}/blobs"
 BOLD="\033[1m"
 RED="\033[31m"
@@ -153,7 +153,7 @@ main() {
 
   echo
   echo "Downloading supporting package blobs:"
-  download_blob oracle-jdk/oracle-jdk.tar.gz "https://download.oracle.com/otn-pub/java/jdk/8u201-b09/42970487e3af4f5aa5bca3f542482c60/jdk-8u201-linux-x64.tar.gz" --header "Cookie: oraclelicense=accept-securebackup-cookie"
+  # download_blob oracle-jdk/oracle-jdk.tar.gz "https://download.oracle.com/otn-pub/java/jdk/8u201-b09/42970487e3af4f5aa5bca3f542482c60/jdk-8u201-linux-x64.tar.gz" --header "Cookie: oraclelicense=accept-securebackup-cookie"
   download_blob cf-cli/cf-cli-binary.tgz "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github"
   download_blob git-client/git-client-source.tar.gz $(get_github_archive_url git git)
   download_blob swarm-client/swarm-client.jar $(get_plugin_url swarm-client)

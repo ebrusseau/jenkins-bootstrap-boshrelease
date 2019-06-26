@@ -2,7 +2,7 @@
 name: jenkins-slave
 
 packages:
-- oracle-jdk
+- openjdk-8
 - git-client
 - cf-cli
 - swarm-client

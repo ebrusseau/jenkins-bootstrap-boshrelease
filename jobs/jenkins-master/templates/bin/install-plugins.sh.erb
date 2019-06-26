@@ -231,11 +231,11 @@ resolveDependencies() {
 bundledPlugins() {
   if [[ -f ${JENKINS} ]]; then
     TEMP_PLUGIN_DIR=/tmp/plugintemp.$$
-    for i in $(${JAVA_HOME}/bin/jar tf ${JENKINS} | grep -E '[^detached-]plugins.*\..pi' | sort); do
+    for i in $(zipinfo -1 ${JENKINS} | grep -E '[^detached-]plugins.*\..pi' | sort); do
       rm -fr ${TEMP_PLUGIN_DIR}
       mkdir -p ${TEMP_PLUGIN_DIR}
       PLUGIN=$(basename "${i}"|cut -f1 -d'.')
-      (cd ${TEMP_PLUGIN_DIR};${JAVA_HOME}/bin/jar xf "${JENKINS}" "${i}";${JAVA_HOME}/bin/jar xvf "${TEMP_PLUGIN_DIR}/${i}" META-INF/MANIFEST.MF >/dev/null 2>&1)
+      (cd ${TEMP_PLUGIN_DIR};unzip -o "${JENKINS}" "${i}";unzip -o "${TEMP_PLUGIN_DIR}/${i}" META-INF/MANIFEST.MF >/dev/null 2>&1)
       VER=$(grep -E -i Plugin-Version "${TEMP_PLUGIN_DIR}/META-INF/MANIFEST.MF"|cut -d: -f2|sed 's/ //')
       echo "${PLUGIN}:${VER}"
     done

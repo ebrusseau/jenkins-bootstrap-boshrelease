@@ -2,7 +2,7 @@
 name: swarm-client
 
 dependencies:
-- oracle-jdk
+- openjdk-8
 
 files:
 - swarm-client/swarm-client.jar

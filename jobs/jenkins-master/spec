@@ -2,7 +2,7 @@
 name: jenkins-master
 
 packages:
-- oracle-jdk
+- openjdk-8
 - git-client
 - cf-cli
 - jenkins

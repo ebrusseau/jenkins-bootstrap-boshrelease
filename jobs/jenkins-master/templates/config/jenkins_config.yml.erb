@@ -13,9 +13,6 @@ jenkins:
   remotingSecurity:
     enabled: true
   slaveAgentPort: 50000
-security:
-  remotingCLI:
-    enabled: false
 unclassified:
   location:
     url: "http://<%= spec.ip %>:<%= p('port') %>"
@@ -27,4 +24,4 @@ tool:
   jdk:
     installations:
     - name: "Default"
-      home: "/var/vcap/packages/oracle-jdk"
+      home: "/var/vcap/packages/openjdk-8/jre"
